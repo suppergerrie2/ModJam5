@@ -1,0 +1,16 @@
+[
+{
+  "modid": "sdrones",
+  "name": "Suppergerrie2's Drone Mod",
+  "description": "This mod adds tiny drones",
+  "version": "1.0",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["suppergerrie2"],
+  "credits": "The internet",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
