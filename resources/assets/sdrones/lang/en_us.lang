@@ -1,3 +1,9 @@
-item.item_drone.name=Drone
+item.item_hauler_drone.name=Hauler Drone
+item.item_fighter_drone.name=Fighter Drone
+
+item.drone_stick.name=Drone Stick
+
+entity.hauler_drone.name=Hauler Drone
+entity.fighter_drone.name=Fighter Drone
 
 itemGroup.tabDronesMod=Drones

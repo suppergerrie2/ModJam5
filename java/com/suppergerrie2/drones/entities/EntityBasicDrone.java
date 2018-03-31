@@ -2,26 +2,28 @@ package com.suppergerrie2.drones.entities;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.suppergerrie2.drones.entities.AI.EntityAIBringItemHome;
-import com.suppergerrie2.drones.entities.AI.EntityAISearchItems;
+import com.suppergerrie2.drones.networking.DronesPacketHandler;
+import com.suppergerrie2.drones.networking.ItemsInDroneMessage;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
-public class EntityBasicDrone extends EntityCreature  {
+public abstract class EntityBasicDrone extends EntityCreature  {
 
 	ItemStack[] itemStacksInDrone;
 	ItemStack spawnedWith;
@@ -33,6 +35,11 @@ public class EntityBasicDrone extends EntityCreature  {
 		this.setSize(0.3f, 0.3f);
 		this.setupAI();
 		itemStacksInDrone = new ItemStack[1];
+		
+		for(int i = 0; i < itemStacksInDrone.length; i++) {
+			itemStacksInDrone[i] = ItemStack.EMPTY;
+		}
+		
 		this.carrySize = 1;
 		this.spawnedWith = ItemStack.EMPTY;
 	}
@@ -48,15 +55,16 @@ public class EntityBasicDrone extends EntityCreature  {
 		this(worldIn, x, y, z, spawnedWith);
 		if(carrySize>0) {
 			itemStacksInDrone = new ItemStack[carrySize];
+			
+			for(int i = 0; i < itemStacksInDrone.length; i++) {
+				itemStacksInDrone[i] = ItemStack.EMPTY;
+			}
+			
 			this.carrySize = carrySize;
 		}
 	}
 
-	void setupAI() {
-		this.tasks.addTask(0, new EntityAISearchItems(this, 1.0f));
-		this.tasks.addTask(0, new EntityAIBringItemHome(this, 1.0f));
-		this.tasks.addTask(1, new EntityAIWanderAvoidWater(this, 1.0f));
-	}
+	abstract void setupAI(); 
 
 	@Override
 	protected void applyEntityAttributes()
@@ -81,6 +89,9 @@ public class EntityBasicDrone extends EntityCreature  {
 				if(itemStacksInDrone[i]==null||itemStacksInDrone[i].isEmpty()) {
 					ItemStack stack = item.getItem().splitStack(1);
 					itemStacksInDrone[i] = stack;
+					
+					DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
+					
 					return true;
 				}
 			}
@@ -113,11 +124,19 @@ public class EntityBasicDrone extends EntityCreature  {
 		compound.setTag("SpawnedWith", nbttagcompound);
 
 		compound.setInteger("CarrySize", carrySize);
+		
+		BlockPos pos = this.getHomePosition();
+		compound.setIntArray("HomePos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
 	}
 
 	public void readEntityFromNBT(NBTTagCompound compound)
 	{
 		super.readEntityFromNBT(compound);
+
+		if(compound.hasKey("CarrySize")) {
+			carrySize = compound.getInteger("CarrySize");
+			this.itemStacksInDrone = new ItemStack[carrySize];
+		}
 
 		if (compound.hasKey("ItemsInDrone", 9))
 		{
@@ -128,14 +147,19 @@ public class EntityBasicDrone extends EntityCreature  {
 				this.itemStacksInDrone[i] =  new ItemStack(nbttaglist.getCompoundTagAt(i));
 			}
 		}
-
+		
 		if(compound.hasKey("SpawnedWith")) {
 			spawnedWith = new ItemStack(compound.getCompoundTag("SpawnedWith"));
 		}
 
-		if(compound.hasKey("CarrySize")) {
-			carrySize = compound.getInteger("CarrySize");
+		if(compound.hasKey("HomePos")) {
+			int[] homePosCoords = compound.getIntArray("HomePos");
+			this.setHomePosAndDistance(new BlockPos(homePosCoords[0], homePosCoords[1], homePosCoords[2]), 64);
 		}
+		
+		System.out.println("test");
+
+		DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
 	}
 
 	public boolean hasItems() {
@@ -146,7 +170,25 @@ public class EntityBasicDrone extends EntityCreature  {
 		}
 		return false;
 	}
+	
+	public void onUpdate() {
+		super.onUpdate();
+		if(this.ticksExisted%20==0) {
+			DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
+		}
+	}
 
+	public boolean processInteract(EntityPlayer player, EnumHand hand)
+    {
+		if(!world.isRemote) {
+			if(player.isSneaking()) {				
+				this.setDead();
+				this.onDeath(DamageSource.causePlayerDamage(player));
+			}
+		}
+		return super.processInteract(player, hand);
+    }
+	
 	@Override
 	protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
 	{
@@ -157,7 +199,6 @@ public class EntityBasicDrone extends EntityCreature  {
 		this.entityDropItem(spawnedWith, 0.1f);
 	}
 
-	//TODO: Remove item from inventory after inserting
 	public boolean insertItems(BlockPos pos) {
 		IBlockState iblockstate = world.getBlockState(pos);
 		if(iblockstate.getBlock() instanceof BlockContainer) {
@@ -169,20 +210,60 @@ public class EntityBasicDrone extends EntityCreature  {
 			IItemHandler itemHandler = destinationResult.getKey();
 			
 			for(int i = 0; i < itemStacksInDrone.length; i++) {
-				if(isFull(itemHandler)) {
+				if(isItemHandlerFull(itemHandler)) {
 					continue;
 				}
 				
 				if(itemStacksInDrone[i]!=null&&!itemStacksInDrone[i].isEmpty()) {
-					tryPutInInventory(itemStacksInDrone[i], itemHandler);
+					itemStacksInDrone[i] = tryPutInInventory(itemStacksInDrone[i], itemHandler);
 				}
 			}
-		}	
+		} else {
+			return false;
+		}
+		
+		DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
 		
 		return true;
 	}
+	
+	public boolean tryGetItem(Class<? extends Item> itemType, BlockPos pos) {
+		
+		if(!this.canPickupItem()) {
+			return false;
+		}
+				
+		IBlockState iblockstate = world.getBlockState(pos);
+		if(iblockstate.getBlock() instanceof BlockContainer) {
+			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
+			if(destinationResult==null) {
+				return false;
+			} 
 
-	private static boolean isFull(IItemHandler itemHandler)
+			IItemHandler itemHandler = destinationResult.getKey();
+			
+			ItemStack pickedUp = this.tryGetFromInventory(itemType, itemHandler);
+			
+			for(int i = 0; i < itemStacksInDrone.length; i++) {
+				if(itemStacksInDrone[i]==null||itemStacksInDrone[i].isEmpty()) {
+					itemStacksInDrone[i] = pickedUp;
+					DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
+					return true;
+				}
+			}
+			
+		} else {
+			return false;
+		}
+		
+		return false;
+	}
+	
+	public ItemStack[] getItemStacksInDrone() {
+		return itemStacksInDrone;
+	}
+
+	private static boolean isItemHandlerFull(IItemHandler itemHandler)
 	{
 		for (int slot = 0; slot < itemHandler.getSlots(); slot++)
 		{
@@ -200,5 +281,19 @@ public class EntityBasicDrone extends EntityCreature  {
 			stack = dest.insertItem(slot, stack, false);
 		}
 		return stack;
+	}
+	
+	private ItemStack tryGetFromInventory(Class<? extends Item> itemType, IItemHandler dest) {
+		ItemStack result = ItemStack.EMPTY;
+		for(int slot = 0; slot < dest.getSlots() && result.isEmpty(); slot++) {
+			if(dest.extractItem(slot, 1, true).getItem().getClass().isInstance(itemType)) {
+				result = dest.extractItem(slot, 1, false);
+			};
+		}
+		return result;
+	}
+
+	public void setItemStacksInDrone(ItemStack[] stacks) {
+		itemStacksInDrone = stacks;	
 	}
 }

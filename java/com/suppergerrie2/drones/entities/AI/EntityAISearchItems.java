@@ -3,10 +3,8 @@ package com.suppergerrie2.drones.entities.AI;
 import java.util.Collections;
 import java.util.List;
 
-import com.suppergerrie2.drones.DroneMod;
 import com.suppergerrie2.drones.entities.EntityBasicDrone;
 
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -25,6 +23,7 @@ public class EntityAISearchItems extends EntityAIBase {
 		this.speed = speed;
 		
 		this.sorter = new EntityAINearestAttackableTarget.Sorter(drone);
+		this.setMutexBits(7);
 	}
 	
 	@Override
@@ -48,7 +47,7 @@ public class EntityAISearchItems extends EntityAIBase {
 
 	@Override
 	public boolean shouldContinueExecuting() {
-		return (target!=null&&!target.isDead);
+		return (target!=null&&!target.isDead&&this.drone.canPickupItem());
 	}
 	
 	@Override
@@ -59,8 +58,8 @@ public class EntityAISearchItems extends EntityAIBase {
 	@Override
 	public void updateTask() {
 		this.drone.getNavigator().tryMoveToEntityLiving(target, this.speed);
-		
-		if(this.drone.getDistanceSq(target)<0.5) {
+
+		if(this.drone.getDistanceSq(target)<1) {
 			this.drone.pickupItem(target);
 		}
 	}

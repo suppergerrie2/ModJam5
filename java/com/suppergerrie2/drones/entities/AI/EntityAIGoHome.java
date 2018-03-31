@@ -5,12 +5,12 @@ import com.suppergerrie2.drones.entities.EntityBasicDrone;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.util.math.BlockPos;
 
-public class EntityAIBringItemHome extends EntityAIBase {
+public class EntityAIGoHome extends EntityAIBase {
 
 	private final EntityBasicDrone drone;
 	private double speed;
 	
-	public EntityAIBringItemHome (EntityBasicDrone drone, double speed) {
+	public EntityAIGoHome (EntityBasicDrone drone, double speed) {
 		this.drone = drone;
 		this.speed = speed;
 		this.setMutexBits(7);
@@ -18,12 +18,12 @@ public class EntityAIBringItemHome extends EntityAIBase {
 	
 	@Override
 	public boolean shouldExecute() {
-		return drone.hasItems();
+		return this.drone.hasHome();
 	}
 	
 	@Override
 	public boolean shouldContinueExecuting() {
-		return drone.hasItems() && drone.getDistanceSq(drone.getHomePosition())>1.3f;
+		return (this.drone.hasHome()&&this.drone.getDistanceSq(this.drone.getHomePosition())<1.5*1.5);
 	}
 	
 	@Override
@@ -36,9 +36,6 @@ public class EntityAIBringItemHome extends EntityAIBase {
 	public void updateTask() {
 		BlockPos home = this.drone.getHomePosition();
 		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), speed);
-				
-		if(drone.getDistanceSq(drone.getHomePosition())<1.5f*1.5f) {
-			drone.insertItems(drone.getHomePosition());
-		}
 	}
+
 }
