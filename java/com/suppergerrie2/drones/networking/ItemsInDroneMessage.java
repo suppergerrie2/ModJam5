@@ -16,9 +16,9 @@ public class ItemsInDroneMessage implements IMessage {
 
 	private ItemStack[] toSend;
 	private int id;
-	
+
 	private ItemStack[] received;
-	
+
 	public ItemsInDroneMessage(ItemStack[] toSend, int id) {
 		this.toSend = toSend;
 		this.id = id;
@@ -42,20 +42,25 @@ public class ItemsInDroneMessage implements IMessage {
 		for(ItemStack stack : toSend) {
 			ByteBufUtils.writeItemStack(buf, stack);
 		}
-		
+
 	}
-	
+
 	public static class ItemsInDroneMessageHandler implements IMessageHandler<ItemsInDroneMessage, IMessage> {
 
-		  @Override public IMessage onMessage(ItemsInDroneMessage message, MessageContext ctx) {
-		    EntityBasicDrone drone = (EntityBasicDrone) Minecraft.getMinecraft().world.getEntityByID(message.id);
-		    
-		    ItemStack[] stacks = message.received;
-		    Minecraft.getMinecraft().addScheduledTask(() -> {
-		    	drone.setItemStacksInDrone(stacks);
-		    });
-		    return null;
-		  }
+		@Override public IMessage onMessage(ItemsInDroneMessage message, MessageContext ctx) {
+
+			int id = message.id;
+			ItemStack[] stacks = message.received;
+			
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				EntityBasicDrone drone = (EntityBasicDrone) Minecraft.getMinecraft().world.getEntityByID(id);
+
+				if(drone!=null) {
+					drone.setItemStacksInDrone(stacks);
+				}
+			});
+			return null;
 		}
+	}
 
 }

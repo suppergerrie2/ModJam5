@@ -2,6 +2,7 @@ package com.suppergerrie2.drones.entities;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.suppergerrie2.drones.items.ItemDroneStick;
 import com.suppergerrie2.drones.networking.DronesPacketHandler;
 import com.suppergerrie2.drones.networking.ItemsInDroneMessage;
 
@@ -29,7 +30,9 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 	ItemStack spawnedWith;
 
 	int carrySize;
-
+	EnumFacing homeFacing;
+	boolean selected = false;
+	
 	public EntityBasicDrone(World worldIn) {
 		super(worldIn);
 		this.setSize(0.3f, 0.3f);
@@ -42,17 +45,19 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		
 		this.carrySize = 1;
 		this.spawnedWith = ItemStack.EMPTY;
+		homeFacing = EnumFacing.UP;
 	}
 
-	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith) {
+	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this(worldIn);		
 		this.setPosition(x,y,z);
 		this.setHomePosAndDistance(new BlockPos(x,y,z), 64);
 		this.spawnedWith = spawnedWith;
+		homeFacing = facing;
 	}
 
-	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, int carrySize) {
-		this(worldIn, x, y, z, spawnedWith);
+	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+		this(worldIn, x, y, z, spawnedWith, facing);
 		if(carrySize>0) {
 			itemStacksInDrone = new ItemStack[carrySize];
 			
@@ -72,6 +77,11 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3D);
+		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(160.0D);
+	}
+	
+	public void setHomeFacing(EnumFacing facing) {
+		this.homeFacing = facing;
 	}
 
 	public boolean canPickupItem() {
@@ -157,8 +167,6 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 			this.setHomePosAndDistance(new BlockPos(homePosCoords[0], homePosCoords[1], homePosCoords[2]), 64);
 		}
 		
-		System.out.println("test");
-
 		DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
 	}
 
@@ -173,6 +181,7 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 	
 	public void onUpdate() {
 		super.onUpdate();
+		this.setGlowing(selected);
 		if(this.ticksExisted%20==0) {
 			DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
 		}
@@ -180,10 +189,14 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 
 	public boolean processInteract(EntityPlayer player, EnumHand hand)
     {
-		if(!world.isRemote) {
+		if(!world.isRemote&&player.getHeldItem(hand).getItem() instanceof ItemDroneStick) {
 			if(player.isSneaking()) {				
 				this.setDead();
 				this.onDeath(DamageSource.causePlayerDamage(player));
+			} else {
+				ItemDroneStick droneStick = (ItemDroneStick)player.getHeldItem(hand).getItem();
+				droneStick.addSelected(this);
+				selected = true;
 			}
 		}
 		return super.processInteract(player, hand);
@@ -199,10 +212,15 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		this.entityDropItem(spawnedWith, 0.1f);
 	}
 
-	public boolean insertItems(BlockPos pos) {
-		IBlockState iblockstate = world.getBlockState(pos);
+	public boolean insertItems(BlockPos pos) {		
+		IBlockState iblockstate;
+		if(world.isAirBlock(pos)) {
+			pos = pos.offset(homeFacing.getOpposite());
+		}
+		iblockstate = world.getBlockState(pos);
 		if(iblockstate.getBlock() instanceof BlockContainer) {
-			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
+			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.UP);
+
 			if(destinationResult==null) {
 				return false;
 			} 
@@ -276,7 +294,7 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		return true;
 	}
 
-	private ItemStack tryPutInInventory(ItemStack stack, IItemHandler dest) {
+	protected ItemStack tryPutInInventory(ItemStack stack, IItemHandler dest) {
 		for(int slot = 0; slot < dest.getSlots() && !stack.isEmpty(); slot++) {
 			stack = dest.insertItem(slot, stack, false);
 		}
@@ -295,5 +313,10 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 
 	public void setItemStacksInDrone(ItemStack[] stacks) {
 		itemStacksInDrone = stacks;	
+	}
+
+	public void setSelected(boolean b) {
+		this.selected = b;
+		this.setGlowing(b);
 	}
 }

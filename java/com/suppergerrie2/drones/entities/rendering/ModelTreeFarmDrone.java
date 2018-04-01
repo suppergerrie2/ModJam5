@@ -1,6 +1,6 @@
 package com.suppergerrie2.drones.entities.rendering;
 
-import com.suppergerrie2.drones.entities.EntityFighterDrone;
+import com.suppergerrie2.drones.entities.EntityTreeFarmDrone;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
@@ -18,14 +18,14 @@ import net.minecraftforge.client.ForgeHooksClient;
  * HaulerDrone - suppergerrie2
  * Created using Tabula 7.0.0
  */
-public class ModelFighterDrone extends ModelBase {
+public class ModelTreeFarmDrone extends ModelBase {
 	public ModelRenderer body;
 	public ModelRenderer trackL;
 	public ModelRenderer trackR;
 	public ModelRenderer antennatorch;
 	public ModelRenderer light;
 
-	public ModelFighterDrone() {
+	public ModelTreeFarmDrone() {
 		this.textureWidth = 64;
 		this.textureHeight = 64;
 		this.trackL = new ModelRenderer(this, 0, 22);
@@ -70,7 +70,7 @@ public class ModelFighterDrone extends ModelBase {
 		GlStateManager.rotate((float) (Math.sin(entity.ticksExisted%20/20f*Math.PI*2)*10f)-90, 1, 0, 0);
 		GlStateManager.rotate(270, 0, 1, 0);
 		
-		ItemStack weapon = ((EntityFighterDrone)entity).getWeapon();
+		ItemStack weapon = ((EntityTreeFarmDrone)entity).getWeapon();
 
 		renderItemStack(weapon, entity.world);
 		

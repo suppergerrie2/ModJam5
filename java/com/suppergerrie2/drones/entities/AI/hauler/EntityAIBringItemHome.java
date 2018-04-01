@@ -1,4 +1,4 @@
-package com.suppergerrie2.drones.entities.AI;
+package com.suppergerrie2.drones.entities.AI.hauler;
 
 import com.suppergerrie2.drones.entities.EntityBasicDrone;
 

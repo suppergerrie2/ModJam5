@@ -31,7 +31,7 @@ public class ItemHaulerDrone extends ItemBasic {
 		{		
 			ItemStack stack = itemstack.copy();
 			stack.setCount(1);
-			EntityHaulerDrone entitydrone = new EntityHaulerDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, 10);
+			EntityHaulerDrone entitydrone = new EntityHaulerDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing, 2);
 			worldIn.spawnEntity(entitydrone);
 		}
 

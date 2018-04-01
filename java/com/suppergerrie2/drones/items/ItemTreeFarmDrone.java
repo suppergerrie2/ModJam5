@@ -1,6 +1,6 @@
 package com.suppergerrie2.drones.items;
 
-import com.suppergerrie2.drones.entities.EntityFighterDrone;
+import com.suppergerrie2.drones.entities.EntityTreeFarmDrone;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -10,9 +10,9 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemFighterDrone extends ItemBasic {
+public class ItemTreeFarmDrone extends ItemBasic {
 
-	public ItemFighterDrone(String name) {
+	public ItemTreeFarmDrone(String name) {
 		super(name);
 	}
 
@@ -31,7 +31,7 @@ public class ItemFighterDrone extends ItemBasic {
 		{		
 			ItemStack stack = itemstack.copy();
 			stack.setCount(1);
-			EntityFighterDrone entitydrone = new EntityFighterDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing);
+			EntityTreeFarmDrone entitydrone = new EntityTreeFarmDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing);
 			worldIn.spawnEntity(entitydrone);
 		}
 

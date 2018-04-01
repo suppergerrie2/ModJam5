@@ -1,9 +1,10 @@
 package com.suppergerrie2.drones.init;
 
 import com.suppergerrie2.drones.Reference;
-import com.suppergerrie2.drones.items.ItemBasic;
+import com.suppergerrie2.drones.items.ItemDroneStick;
 import com.suppergerrie2.drones.items.ItemFighterDrone;
 import com.suppergerrie2.drones.items.ItemHaulerDrone;
+import com.suppergerrie2.drones.items.ItemTreeFarmDrone;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -20,7 +21,8 @@ public class ModItems {
 
 	public static Item itemHaulerDrone;
 	public static Item itemFighterDrone;
-
+	public static Item itemTreeFarmDrone;
+	
 	public static Item droneStick;
 	
 	public static final CreativeTabs tabDronesMod = new CreativeTabs("tabDronesMod") {
@@ -40,21 +42,24 @@ public class ModItems {
 	public static void init() {
 		itemHaulerDrone = new ItemHaulerDrone("item_hauler_drone");
 		itemFighterDrone = new ItemFighterDrone("item_fighter_drone");
+		itemTreeFarmDrone = new ItemTreeFarmDrone("item_tree_farm_drone");
 		
-		droneStick = new ItemBasic("drone_stick");
+		droneStick = new ItemDroneStick("drone_stick");
 	}
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		init();
 		
-		event.getRegistry().registerAll(itemHaulerDrone, itemFighterDrone, droneStick);
+		event.getRegistry().registerAll(itemHaulerDrone, itemFighterDrone, droneStick, itemTreeFarmDrone);
 	}
 	
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event) {
 		registerRender(itemHaulerDrone);
 		registerRender(itemFighterDrone);
+		registerRender(itemTreeFarmDrone);
+		
 		registerRender(droneStick);
 	}
 	

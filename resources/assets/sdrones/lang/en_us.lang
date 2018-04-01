@@ -1,9 +1,11 @@
 item.item_hauler_drone.name=Hauler Drone
 item.item_fighter_drone.name=Fighter Drone
+item.item_tree_farm_drone.name=Tree Farm Drone
 
 item.drone_stick.name=Drone Stick
 
 entity.hauler_drone.name=Hauler Drone
 entity.fighter_drone.name=Fighter Drone
+entity.tree_farm_drone.name=Tree Farm Drone
 
 itemGroup.tabDronesMod=Drones

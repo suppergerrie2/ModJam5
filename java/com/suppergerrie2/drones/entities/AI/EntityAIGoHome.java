@@ -23,7 +23,7 @@ public class EntityAIGoHome extends EntityAIBase {
 	
 	@Override
 	public boolean shouldContinueExecuting() {
-		return (this.drone.hasHome()&&this.drone.getDistanceSq(this.drone.getHomePosition())<1.5*1.5);
+		return (this.drone.hasHome()&&this.drone.getDistanceSq(this.drone.getHomePosition())>1.5*1.5);
 	}
 	
 	@Override

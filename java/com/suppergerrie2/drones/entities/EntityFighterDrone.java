@@ -11,16 +11,19 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class EntityFighterDrone extends EntityBasicDrone {
 	
-	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, int carrySize) {
-		super(worldIn, x, y, z, spawnedWith, carrySize);
+	//TODO: Variable weapons?
+	
+	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
 	}
 
-	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith) {
-		super(worldIn, x, y, z, spawnedWith);
+	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
+		this(worldIn, x, y, z, spawnedWith, facing, 1);
 	}
 
 	public EntityFighterDrone(World worldIn) {
@@ -30,8 +33,8 @@ public class EntityFighterDrone extends EntityBasicDrone {
 	@Override
 	void setupAI() {
 		this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
-		this.tasks.addTask(1, new EntityAIWanderAvoidWater(this, 1.0f));
 		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
+		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
 		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, true, true));
 	}
 

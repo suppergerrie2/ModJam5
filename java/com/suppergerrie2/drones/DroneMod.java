@@ -2,8 +2,10 @@ package com.suppergerrie2.drones;
 
 import org.apache.logging.log4j.Logger;
 
+import com.suppergerrie2.drones.entities.EntityBasicDrone;
 import com.suppergerrie2.drones.entities.EntityFighterDrone;
 import com.suppergerrie2.drones.entities.EntityHaulerDrone;
+import com.suppergerrie2.drones.entities.EntityTreeFarmDrone;
 import com.suppergerrie2.drones.networking.DronesPacketHandler;
 import com.suppergerrie2.drones.proxies.IProxy;
 
@@ -28,13 +30,15 @@ public class DroneMod {
 	
 	public static Logger logger;
 	
+	static int entityID = 0;
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
-		
-		
-		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, "fighter_drone"), EntityFighterDrone.class, "fighter_drone", 0, this, 80, 1, true);
-		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, "hauler_drone"), EntityHaulerDrone.class, "hauler_drone", 1, this, 80, 1, true);
+
+		registerDrone(EntityHaulerDrone.class, "hauler_drone");
+		registerDrone(EntityFighterDrone.class, "fighter_drone");
+		registerDrone(EntityTreeFarmDrone.class, "tree_farm_drone");
 		
 		proxy.preInit(event);
 		logger.info("preInit");
@@ -49,6 +53,10 @@ public class DroneMod {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("postInit");
+	}
+	
+	private void registerDrone(Class<? extends EntityBasicDrone> droneClass, String name) {
+		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, name), droneClass, name, entityID++, this, 80, 1, true);
 	}
 	
 }
