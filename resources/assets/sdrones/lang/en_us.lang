@@ -8,4 +8,7 @@ entity.hauler_drone.name=Hauler Drone
 entity.fighter_drone.name=Fighter Drone
 entity.tree_farm_drone.name=Tree Farm Drone
 
+sdrones.subtitle.drone_bleep=Drone bleeps
+sdrones.subtitle.drone_driving=Drone is driving
+
 itemGroup.tabDronesMod=Drones
