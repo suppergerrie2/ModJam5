@@ -10,7 +10,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemHaulerDrone extends ItemBasic {
+public class ItemHaulerDrone extends ItemDrone {
 
 	public ItemHaulerDrone(String name) {
 		super(name);
@@ -32,6 +32,11 @@ public class ItemHaulerDrone extends ItemBasic {
 			ItemStack stack = itemstack.copy();
 			stack.setCount(1);
 			EntityHaulerDrone entitydrone = new EntityHaulerDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing, 2);
+			
+			if(this.hasFilter(stack)) {
+				entitydrone.setFilter(this.getFilter(itemstack));
+			}
+			
 			worldIn.spawnEntity(entitydrone);
 		}
 

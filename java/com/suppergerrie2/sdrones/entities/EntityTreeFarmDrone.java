@@ -12,7 +12,6 @@ import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
 import com.suppergerrie2.sdrones.networking.ItemsInDroneMessage;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockSapling;

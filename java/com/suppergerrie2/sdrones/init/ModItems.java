@@ -5,11 +5,13 @@ import com.suppergerrie2.sdrones.items.ItemDroneStick;
 import com.suppergerrie2.sdrones.items.ItemFighterDrone;
 import com.suppergerrie2.sdrones.items.ItemHaulerDrone;
 import com.suppergerrie2.sdrones.items.ItemTreeFarmDrone;
+import com.suppergerrie2.sdrones.items.crafting.RecipeFilterDrone;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
@@ -61,6 +63,13 @@ public class ModItems {
 		registerRender(itemTreeFarmDrone);
 		
 		registerRender(droneStick);
+	}
+	
+	@SubscribeEvent
+	public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+		IRecipe recipe = new RecipeFilterDrone().setRegistryName("filter_recipe");
+		
+		event.getRegistry().register(recipe);
 	}
 	
 	private static void registerRender(Item item) {

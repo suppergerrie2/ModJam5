@@ -18,34 +18,34 @@ public class EntityAISearchItems extends EntityAIBase {
 	private EntityAINearestAttackableTarget.Sorter sorter;
 	private EntityItem target;
 	private double speed;
-	
+
 	static List<EntityItem> claimedItems = new ArrayList<EntityItem>(); 
-	
+
 	private int waitTime;
-	
+
 	public EntityAISearchItems (EntityBasicDrone drone, double speed) {
 		this.drone = drone;
 		this.speed = speed;
-		
+
 		this.sorter = new EntityAINearestAttackableTarget.Sorter(drone);
 		this.setMutexBits(7);
 	}
-	
+
 	@Override
 	public boolean shouldExecute() {
 		if(!drone.canPickupItem()) {
 			return false;
 		}
-		
+
 		double range = 20;
 		List<EntityItem> itemsInRange = this.drone.world.<EntityItem>getEntitiesWithinAABB(EntityItem.class, this.drone.getEntityBoundingBox().grow(range, 4.0D,  range));
 		Collections.sort(itemsInRange, this.sorter);
-				
+
 		if(itemsInRange.isEmpty()) {
 			return false;
 		} else {
 			for(EntityItem item : itemsInRange) {
-				if(!claimedItems.contains(item)) {
+				if(!claimedItems.contains(item)&&drone.canPickupItem(item.getItem())) {
 					target = item;
 					claimedItems.add(item);
 					return true;
@@ -53,7 +53,7 @@ public class EntityAISearchItems extends EntityAIBase {
 			}
 		}
 		return false;
-		
+
 	}
 
 	@Override
@@ -61,38 +61,36 @@ public class EntityAISearchItems extends EntityAIBase {
 		if(target!=null&&target.isDead&&claimedItems.contains(target)) {
 			claimedItems.remove(target);
 		}
-		return (target!=null&&!target.isDead&&this.drone.canPickupItem());
+		return (target!=null&&!target.isDead&&this.drone.canPickupItem(target.getItem()));
 	}
-	
+
 	@Override
 	public void startExecuting() {
 		this.drone.getNavigator().tryMoveToEntityLiving(target, this.speed);
 		waitTime = 5*20;
 	}
-	
+
 	@Override
 	public void updateTask() {
 		this.drone.getNavigator().tryMoveToEntityLiving(target, this.speed);
 		waitTime--;
-		
+
 		if(waitTime<=0) {
 			claimedItems.remove(target);
 			target=null;
 			return;
 		}
-		
+
 		if(this.drone.getDistanceSq(target)<1&&!target.cannotPickup()) {
 			this.drone.pickupItem(target);
-//			if(target.getItem().isEmpty()) {
-				claimedItems.remove(target);
-				target = null;
-//			}
+			claimedItems.remove(target);
+			target = null;
 		}
 	}
-	
-    protected double getFollowRange()
-    {
-        IAttributeInstance iattributeinstance = this.drone.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
-        return iattributeinstance == null ? 16.0D : iattributeinstance.getAttributeValue();
-    }
+
+	protected double getFollowRange()
+	{
+		IAttributeInstance iattributeinstance = this.drone.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
+		return iattributeinstance == null ? 16.0D : iattributeinstance.getAttributeValue();
+	}
 }
