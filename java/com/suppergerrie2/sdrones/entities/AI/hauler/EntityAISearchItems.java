@@ -1,8 +1,9 @@
 package com.suppergerrie2.sdrones.entities.AI.hauler;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
 
@@ -19,7 +20,7 @@ public class EntityAISearchItems extends EntityAIBase {
 	private EntityItem target;
 	private double speed;
 
-	static List<EntityItem> claimedItems = new ArrayList<EntityItem>(); 
+	static Map<EntityItem, Integer> claimedItems = new HashMap<EntityItem, Integer>(); 
 
 	private int waitTime;
 
@@ -45,10 +46,19 @@ public class EntityAISearchItems extends EntityAIBase {
 			return false;
 		} else {
 			for(EntityItem item : itemsInRange) {
-				if(!claimedItems.contains(item)&&drone.canPickupItem(item.getItem())) {
-					target = item;
-					claimedItems.add(item);
-					return true;
+				int itemsLeft = item.getItem().getCount();
+
+				if(claimedItems.containsKey(item)) {
+					itemsLeft-=claimedItems.get(item);
+				}
+
+				if(itemsLeft>0&&drone.canPickupItem(item.getItem())) {
+					if(drone.getNavigator().getPathToEntityLiving(item)!=null) {
+
+						target = item;
+						claimedItems.put(item, drone.getCarrySize());
+						return true;
+					}
 				}
 			}
 		}
@@ -58,7 +68,7 @@ public class EntityAISearchItems extends EntityAIBase {
 
 	@Override
 	public boolean shouldContinueExecuting() {
-		if(target!=null&&target.isDead&&claimedItems.contains(target)) {
+		if(target!=null&&target.isDead&&claimedItems.containsKey(target)) {
 			claimedItems.remove(target);
 		}
 		return (target!=null&&!target.isDead&&this.drone.canPickupItem(target.getItem()));

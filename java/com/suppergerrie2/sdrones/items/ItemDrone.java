@@ -34,6 +34,9 @@ public abstract class ItemDrone extends ItemBasic {
 					tooltip.add(" -" + filter[i].getDisplayName());
 				}
 			}
+			
+			int upgrade = nbt.getInteger("storageupgrade");
+			tooltip.add("Storage upgrade: " + upgrade);
 		}
 	}
 	
@@ -65,5 +68,13 @@ public abstract class ItemDrone extends ItemBasic {
 			return filter;
 		}
 		return new ArrayList<ItemStack>();
+	}
+	
+	public int getStorageUpgrade(ItemStack stack) {
+		NBTTagCompound nbt = stack.getTagCompound();
+		if(nbt!=null) {
+			return nbt.getInteger("storageupgrade");
+		}
+		return 0;
 	}
 }

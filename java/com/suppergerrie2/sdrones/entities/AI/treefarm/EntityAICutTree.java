@@ -55,8 +55,8 @@ public class EntityAICutTree extends EntityAIBase {
 			if((homepos.getX()+xOffset)%treeDist!=0) continue;
 
 			for(int zOffset = -range; zOffset < range; zOffset++) {
+				if((homepos.getZ()+zOffset)%treeDist!=0) continue;
 				for(int yOffset = -2; yOffset <= 1; yOffset++) {
-					if((homepos.getZ()+zOffset)%treeDist!=0) continue;
 
 					BlockPos pos = homepos.add(xOffset, yOffset, zOffset);
 

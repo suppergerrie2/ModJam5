@@ -1,18 +1,18 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "sd"
+        "hd"
     ],
     "key": {
         "d": {
             "item": "sdrones:item_hauler_drone"
         },
-        "s": {
-            "item": "minecraft:diamond_sword"
+        "h": {
+            "item": "minecraft:diamond_hoe"
         }
     },
     "result": {
-        "item": "sdrones:item_fighter_drone",
+        "item": "sdrones:item_crop_farm_drone",
         "count": 1
     }
 }

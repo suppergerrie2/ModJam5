@@ -1,6 +1,6 @@
 package com.suppergerrie2.sdrones.items;
 
-import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
+import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -10,9 +10,9 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemHaulerDrone extends ItemDrone {
+public class ItemCropFarmDrone extends ItemDrone {
 
-	public ItemHaulerDrone(String name) {
+	public ItemCropFarmDrone(String name) {
 		super(name);
 	}
 
@@ -31,9 +31,7 @@ public class ItemHaulerDrone extends ItemDrone {
 		{		
 			ItemStack stack = itemstack.copy();
 			stack.setCount(1);
-			EntityHaulerDrone entitydrone = new EntityHaulerDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing, this.getStorageUpgrade(itemstack)+1);
-			
-			System.out.println(this.getStorageUpgrade(stack));
+			EntityCropFarmDrone entitydrone = new EntityCropFarmDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing);
 			
 			if(this.hasFilter(stack)) {
 				entitydrone.setFilter(this.getFilter(itemstack));
@@ -44,6 +42,4 @@ public class ItemHaulerDrone extends ItemDrone {
 
 		return EnumActionResult.SUCCESS;
 	}
-	
-	
 }

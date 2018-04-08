@@ -11,6 +11,7 @@ import com.suppergerrie2.sdrones.items.ItemDroneStick;
 import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
 import com.suppergerrie2.sdrones.networking.ItemsInDroneMessage;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.state.IBlockState;
@@ -29,33 +30,31 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
-public abstract class EntityBasicDrone extends EntityCreature  {
+public abstract class EntityBasicDrone extends EntityCreature implements IEntityAdditionalSpawnData {
 
-	ItemStack[] itemStacksInDrone;
+	private ItemStack[] itemStacksInDrone;
 	ItemStack spawnedWith;
 
 	List<ItemStack> filter = new ArrayList<ItemStack>();
-
-	int carrySize;
+	
+//	@Deprecated
+//	int carrySize;
+	int carryLevel = 1;
 	EnumFacing homeFacing;
 	boolean selected = false;
+	int range = 16;
 
 	public EntityBasicDrone(World worldIn) {
 		super(worldIn);
 		this.setSize(0.3f, 0.3f);
-		this.setupAI();
-		itemStacksInDrone = new ItemStack[1];
-
-		for(int i = 0; i < itemStacksInDrone.length; i++) {
-			itemStacksInDrone[i] = ItemStack.EMPTY;
-		}
-
-		this.carrySize = 1;
-		this.spawnedWith = ItemStack.EMPTY;
 		this.enablePersistence();
+		this.setupItemStacksInDrone();
+		this.spawnedWith = ItemStack.EMPTY;
 		homeFacing = EnumFacing.UP;
 	}
 
@@ -67,20 +66,26 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		homeFacing = facing;
 	}
 
-	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carryLevel) {
 		this(worldIn, x, y, z, spawnedWith, facing);
-		if(carrySize>0) {
-			itemStacksInDrone = new ItemStack[carrySize];
+		this.carryLevel = carryLevel;
+		this.setupItemStacksInDrone();
+	}
+	
+	@Override
+	protected abstract void initEntityAI(); 
 
-			for(int i = 0; i < itemStacksInDrone.length; i++) {
-				itemStacksInDrone[i] = ItemStack.EMPTY;
+	void setupItemStacksInDrone() {
+		if(this.getCarrySize()>0) {
+			ItemStack[] itemsInDrone = new ItemStack[this.getCarrySize()];
+
+			for(int i = 0; i <itemsInDrone.length; i++) {
+				itemsInDrone[i] = ItemStack.EMPTY;
 			}
 
-			this.carrySize = carrySize;
+			this.setItemStacksInDrone(itemsInDrone);
 		}
 	}
-
-	abstract void setupAI(); 
 
 	@Override
 	protected void applyEntityAttributes()
@@ -91,49 +96,20 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(160.0D);
 	}
 
-	public void setHomeFacing(EnumFacing facing) {
-		this.homeFacing = facing;
+	public void writeSpawnData(ByteBuf buffer) {
+		buffer.writeInt(this.itemStacksInDrone.length);
+		for(ItemStack stack : this.itemStacksInDrone) {
+			ByteBufUtils.writeItemStack(buffer, stack);
+		}
 	}
 
-	public boolean canPickupItem(ItemStack item) {
-		if(filter.size()>0) {
-			boolean isInFilter = false;
-			for(ItemStack itemStack : filter) {
-				if(item.isItemEqual(itemStack)) {
-					isInFilter = true;
-				}
-			}
-			if(!isInFilter) {
-				return false;
-			}
+	public void readSpawnData(ByteBuf buf) {
+		int size = buf.readInt();
+		ItemStack[] stacks = new ItemStack[size];
+		for(int i = 0; i < size; i++) {
+			stacks[i] = ByteBufUtils.readItemStack(buf);
 		}
-		
-		return this.canPickupItem();
-	}
-	
-	public boolean canPickupItem() {
-		for(ItemStack stack : itemStacksInDrone) {
-			if(stack==null||stack.isEmpty()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean pickupItem(EntityItem item) {
-		if(!item.cannotPickup()&&canPickupItem(item.getItem())) {
-			for(int i = 0; i < itemStacksInDrone.length; i++) {
-				if(itemStacksInDrone[i]==null||itemStacksInDrone[i].isEmpty()) {
-					ItemStack stack = item.getItem().splitStack(1);
-					itemStacksInDrone[i] = stack;
-
-					DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
-
-					return true;
-				}
-			}
-		}
-		return false;
+		this.setItemStacksInDrone(stacks);
 	}
 
 	public void writeEntityToNBT(NBTTagCompound compound)
@@ -142,7 +118,7 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 
 		NBTTagList nbttaglist = new NBTTagList();
 
-		for (ItemStack itemstack : this.itemStacksInDrone)
+		for (ItemStack itemstack : this.getItemStacksInDrone())
 		{
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
 
@@ -156,11 +132,28 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 
 		compound.setTag("ItemsInDrone", nbttaglist);
 
+		NBTTagList nbttaglistfilter = new NBTTagList();
+
+		for (ItemStack itemstack : this.filter)
+		{
+			NBTTagCompound nbttagcompound = new NBTTagCompound();
+
+			if (itemstack!=null&&!itemstack.isEmpty())
+			{
+				itemstack.writeToNBT(nbttagcompound);
+			}
+
+			nbttaglistfilter.appendTag(nbttagcompound);
+		}
+
+		compound.setTag("Filter", nbttaglistfilter);
+
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
 		spawnedWith.writeToNBT(nbttagcompound);
 		compound.setTag("SpawnedWith", nbttagcompound);
 
-		compound.setInteger("CarrySize", carrySize);
+		compound.setInteger("CarrySize", this.getCarrySize());
+		compound.setInteger("CarryLevel", carryLevel);
 
 		BlockPos pos = this.getHomePosition();
 		compound.setIntArray("HomePos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
@@ -170,18 +163,33 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 	{
 		super.readEntityFromNBT(compound);
 
-		if(compound.hasKey("CarrySize")) {
-			carrySize = compound.getInteger("CarrySize");
-			this.itemStacksInDrone = new ItemStack[carrySize];
+//		if(compound.hasKey("CarrySize")) {
+//			carrySize = compound.getInteger("CarrySize");
+//			this.setItemStacksInDrone(new ItemStack[carrySize]);
+//		}
+		
+		if(compound.hasKey("CarryLevel")) {
+			carryLevel = compound.getInteger("CarryLevel");
+			this.setItemStacksInDrone(new ItemStack[this.getCarrySize()]);
 		}
 
 		if (compound.hasKey("ItemsInDrone", 9))
 		{
 			NBTTagList nbttaglist = compound.getTagList("ItemsInDrone", 10);
 
-			for (int i = 0; i < this.itemStacksInDrone.length; ++i)
+			for (int i = 0; i < this.getItemStacksInDrone().length; ++i)
 			{
-				this.itemStacksInDrone[i] =  new ItemStack(nbttaglist.getCompoundTagAt(i));
+				this.setItemStacksInDrone(i, new ItemStack(nbttaglist.getCompoundTagAt(i)));
+			}
+		}
+
+		if (compound.hasKey("Filter", 9))
+		{
+			NBTTagList nbttaglist = compound.getTagList("Filter", 10);
+
+			for (int i = 0; i < nbttaglist.tagCount(); ++i)
+			{
+				filter.add(new ItemStack(nbttaglist.getCompoundTagAt(i)));
 			}
 		}
 
@@ -193,59 +201,30 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 			int[] homePosCoords = compound.getIntArray("HomePos");
 			this.setHomePosAndDistance(new BlockPos(homePosCoords[0], homePosCoords[1], homePosCoords[2]), 64);
 		}
-
-		DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
-	}
-
-	public boolean hasItems() {
-		for(ItemStack stack : itemStacksInDrone) {
-			if(stack!=null&&!stack.isEmpty()) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public void onUpdate() {
 		super.onUpdate();
 		this.setGlowing(selected);
-		if(!world.isRemote&&this.ticksExisted%100==0) {
-			DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
-		}
 
 		if(this.selected) {
 			BlockPos home = this.getHomePosition();
-			Minecraft.getMinecraft().effectRenderer.addEffect(new HomeParticle(world, home.getX()+0.5, home.getY(), home.getZ()+0.5, 1, 1, 1));
+//			Minecraft.getMinecraft().effectRenderer.addEffect(new HomeParticle(world, home.getX()+0.5, home.getY(), home.getZ()+0.5, 1, 1, 1));
 		}
 	}
 
-	public boolean processInteract(EntityPlayer player, EnumHand hand)
-	{
-		if(!world.isRemote&&player.getHeldItem(hand).getItem() instanceof ItemDroneStick) {
-			if(player.isSneaking()) {				
-				this.setDead();
-				this.onDeath(DamageSource.causePlayerDamage(player));
-			} else {
-				ItemDroneStick droneStick = (ItemDroneStick)player.getHeldItem(hand).getItem();
-				droneStick.addSelected(this);
-				selected = true;
+	public boolean pickupItem(EntityItem item) {
+		if(!item.cannotPickup()&&canPickupItem(item.getItem())) {
+			for(int i = 0; i < getItemStacksInDrone().length; i++) {
+				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
+					ItemStack stack = item.getItem().splitStack(1);
+					this.setItemStacksInDrone(i, stack);
+
+					return true;
+				}
 			}
 		}
-		return super.processInteract(player, hand);
-	}
-
-	@Override
-	protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
-	{
-		for(ItemStack stack : itemStacksInDrone) {
-			if(stack==null) continue;
-			this.entityDropItem(stack, 0.1f);
-		}
-		this.entityDropItem(spawnedWith, 0.1f);
-	}
-
-	public void setFilter(List<ItemStack> list) {
-		filter = list;
+		return false;
 	}
 
 	public boolean insertItems(BlockPos pos) {		
@@ -263,20 +242,18 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 
 			IItemHandler itemHandler = destinationResult.getKey();
 
-			for(int i = 0; i < itemStacksInDrone.length; i++) {
+			for(int i = 0; i < getItemStacksInDrone().length; i++) {
 				if(isItemHandlerFull(itemHandler)) {
 					continue;
 				}
 
-				if(itemStacksInDrone[i]!=null&&!itemStacksInDrone[i].isEmpty()) {
-					itemStacksInDrone[i] = tryPutInInventory(itemStacksInDrone[i], itemHandler);
+				if(getItemStacksInDrone()[i]!=null&&!getItemStacksInDrone()[i].isEmpty()) {
+					this.setItemStacksInDrone(i, tryPutInInventory(getItemStacksInDrone()[i], itemHandler));
 				}
 			}
 		} else {
 			return false;
 		}
-
-		DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
 
 		return true;
 	}
@@ -298,10 +275,9 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 
 			ItemStack pickedUp = this.tryGetFromInventory(itemType, itemHandler);
 
-			for(int i = 0; i < itemStacksInDrone.length; i++) {
-				if(itemStacksInDrone[i]==null||itemStacksInDrone[i].isEmpty()) {
-					itemStacksInDrone[i] = pickedUp;
-					DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(itemStacksInDrone, this.getEntityId()));
+			for(int i = 0; i < getItemStacksInDrone().length; i++) {
+				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
+					this.setItemStacksInDrone(i, pickedUp);
 					return true;
 				}
 			}
@@ -311,23 +287,6 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		}
 
 		return false;
-	}
-
-	public ItemStack[] getItemStacksInDrone() {
-		return itemStacksInDrone;
-	}
-
-	private static boolean isItemHandlerFull(IItemHandler itemHandler)
-	{
-		for (int slot = 0; slot < itemHandler.getSlots(); slot++)
-		{
-			ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
-			if (stackInSlot.isEmpty() || stackInSlot.getCount() != stackInSlot.getMaxStackSize())
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 
 	protected ItemStack tryPutInInventory(ItemStack stack, IItemHandler dest) {
@@ -347,13 +306,42 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		return result;
 	}
 
-	public void setItemStacksInDrone(ItemStack[] stacks) {
-		itemStacksInDrone = stacks;	
+	private static boolean isItemHandlerFull(IItemHandler itemHandler)
+	{
+		for (int slot = 0; slot < itemHandler.getSlots(); slot++)
+		{
+			ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
+			if (stackInSlot.isEmpty() || stackInSlot.getCount() != stackInSlot.getMaxStackSize())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
-	public void setSelected(boolean b) {
-		this.selected = b;
-		this.setGlowing(b);
+	public boolean processInteract(EntityPlayer player, EnumHand hand)
+	{
+		if(!world.isRemote&&player.getHeldItem(hand).getItem() instanceof ItemDroneStick) {
+			if(player.isSneaking()) {				
+				this.setDead();
+				this.onDeath(DamageSource.causePlayerDamage(player));
+			} else {
+				ItemDroneStick droneStick = (ItemDroneStick)player.getHeldItem(hand).getItem();
+				droneStick.addSelected(this);
+				selected = true;
+			}
+		}
+		return super.processInteract(player, hand);
+	}
+
+	@Override
+	protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
+	{
+		for(ItemStack stack : getItemStacksInDrone()) {
+			if(stack==null) continue;
+			this.entityDropItem(stack, 0.1f);
+		}
+		this.entityDropItem(spawnedWith, 0.1f);
 	}
 
 	protected SoundEvent getAmbientSound()
@@ -361,15 +349,20 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		return ModSoundEvents.droneBleepSound;
 	}
 
-	//    protected SoundEvent getHurtSound(DamageSource damageSourceIn)
-	//    {
-	//        return ;
-	//    }
-	//
-	//    protected SoundEvent getDeathSound()
-	//    {
-	//        return ;
-	//    }
+	protected SoundEvent getHurtSound(DamageSource damageSourceIn)
+	{
+		return null;
+	}
+
+	protected SoundEvent getDeathSound()
+	{
+		return null;
+	}
+
+	protected float getSoundVolume()
+	{
+		return 0.4F;
+	}
 
 	protected void playStepSound(BlockPos pos, Block blockIn)
 	{
@@ -390,11 +383,90 @@ public abstract class EntityBasicDrone extends EntityCreature  {
 		}
 	}
 
-	/**
-	 * Returns the volume for the sounds this mob makes.
-	 */
-	protected float getSoundVolume()
-	{
-		return 0.4F;
+	public boolean canPickupItem(ItemStack item) {
+		if(filter.size()>0) {
+			boolean isInFilter = false;
+			for(ItemStack itemStack : filter) {
+				if(item.isItemEqual(itemStack)) {
+					isInFilter = true;
+				}
+			}
+			if(!isInFilter) {
+				return false;
+			}
+		}
+
+		return this.canPickupItem();
+	}
+
+	public boolean canPickupItem() {
+		for(ItemStack stack : getItemStacksInDrone()) {
+			if(stack==null||stack.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean hasItems() {
+		for(ItemStack stack : getItemStacksInDrone()) {
+			if(stack!=null&&!stack.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void setFilter(List<ItemStack> list) {
+		filter = list;
+	}
+
+	public void setSelected(boolean b) {
+		this.selected = b;
+		this.setGlowing(b);
+	}
+
+	public void setHomeFacing(EnumFacing facing) {
+		this.homeFacing = facing;
+	}
+
+	public void setRange(int range) {
+		this.range = range;
+	}
+	
+	public int getRange() {
+		return this.range;
+	}
+	
+	public ItemStack[] getItemStacksInDrone() {
+		return itemStacksInDrone;
+	}
+
+	public void setItemStacksInDrone(ItemStack[] stacks, boolean sendMessage) {	
+		for(int i = 0; i < stacks.length; i++) {
+			if(stacks[i]==null) {
+				stacks[i]=ItemStack.EMPTY;
+			}
+		}
+
+		itemStacksInDrone = stacks;	
+
+		if(sendMessage) DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
+	}
+
+	public void setItemStacksInDrone(int slot, ItemStack stack) {	
+		if(stack==null) stack = ItemStack.EMPTY;
+
+		itemStacksInDrone[slot] = stack;
+		DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
+	}
+
+	public void setItemStacksInDrone(ItemStack[] stacks) {
+		this.setItemStacksInDrone(stacks, true);
+	}
+
+	public int getCarrySize() {
+		//TODO: Find nice formula
+		return 2+(this.carryLevel-1);
 	}
 }

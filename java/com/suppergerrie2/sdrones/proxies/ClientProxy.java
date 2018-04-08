@@ -1,8 +1,10 @@
 package com.suppergerrie2.sdrones.proxies;
 
+import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
 import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
 import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
 import com.suppergerrie2.sdrones.entities.EntityTreeFarmDrone;
+import com.suppergerrie2.sdrones.entities.rendering.RenderCropFarmDrone;
 import com.suppergerrie2.sdrones.entities.rendering.RenderFighterDrone;
 import com.suppergerrie2.sdrones.entities.rendering.RenderHaulerDrone;
 import com.suppergerrie2.sdrones.entities.rendering.RenderTreeFarmDrone;
@@ -19,14 +21,6 @@ public class ClientProxy implements IProxy {
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
-//		IRenderFactory<EntityHaulerDrone> test = new IRenderFactory<EntityHaulerDrone>() {
-//
-//			@Override
-//			public Render<? super EntityHaulerDrone> createRenderFor(RenderManager manager) {
-//				return new RenderHaulerDrone(manager);
-//			}
-//		};
-//		
 		RenderingRegistry.registerEntityRenderingHandler(EntityHaulerDrone.class, new IRenderFactory<EntityHaulerDrone>() {
 
 			@Override
@@ -34,14 +28,6 @@ public class ClientProxy implements IProxy {
 				return new RenderHaulerDrone(manager);
 			}
 		});
-		
-//		IRenderFactory<EntityFighterDrone> test2 = new IRenderFactory<EntityFighterDrone>() {
-//
-//			@Override
-//			public Render<? super EntityFighterDrone> createRenderFor(RenderManager manager) {
-//				return new RenderFighterDrone(manager);
-//			}
-//		};
 		
 		RenderingRegistry.registerEntityRenderingHandler(EntityFighterDrone.class, new IRenderFactory<EntityFighterDrone>() {
 
@@ -56,6 +42,14 @@ public class ClientProxy implements IProxy {
 			@Override
 			public Render<? super EntityTreeFarmDrone> createRenderFor(RenderManager manager) {
 				return new RenderTreeFarmDrone(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityCropFarmDrone.class, new IRenderFactory<EntityCropFarmDrone>() {
+
+			@Override
+			public Render<? super EntityCropFarmDrone> createRenderFor(RenderManager manager) {
+				return new RenderCropFarmDrone(manager);
 			}
 		});
 	}

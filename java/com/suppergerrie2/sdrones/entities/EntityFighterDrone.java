@@ -20,6 +20,7 @@ public class EntityFighterDrone extends EntityBasicDrone {
 	
 	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
 		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
+		this.setRange(16);
 	}
 
 	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
@@ -31,7 +32,7 @@ public class EntityFighterDrone extends EntityBasicDrone {
 	}
 
 	@Override
-	void setupAI() {
+	protected void initEntityAI() {
 		this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
 		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
@@ -52,7 +53,6 @@ public class EntityFighterDrone extends EntityBasicDrone {
 	public boolean attackEntityAsMob(Entity entityIn)
 	{
 		return entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), 7);
-		
 	}
 	
 	public ItemStack getWeapon() {

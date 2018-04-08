@@ -56,7 +56,7 @@ public class ItemsInDroneMessage implements IMessage {
 				EntityBasicDrone drone = (EntityBasicDrone) Minecraft.getMinecraft().world.getEntityByID(id);
 
 				if(drone!=null) {
-					drone.setItemStacksInDrone(stacks);
+					drone.setItemStacksInDrone(stacks, false);
 				}
 			});
 			return null;

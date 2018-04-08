@@ -15,6 +15,7 @@ public class EntityHaulerDrone extends EntityBasicDrone {
 	
 	public EntityHaulerDrone(World worldIn) {
 		super(worldIn);
+		this.setRange(16);
 	}
 
 	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
@@ -25,11 +26,11 @@ public class EntityHaulerDrone extends EntityBasicDrone {
 		this(worldIn, x, y, z, spawnedWith, facing, 1);
 	}
 	
-	void setupAI() {
+	protected void initEntityAI() {
 		this.tasks.addTask(0, new EntityAISearchItems(this, 1.0f));
-		this.tasks.addTask(0, new EntityAIBringItemHome(this, 1.0f));
-		this.tasks.addTask(1, new EntityAIWanderAvoidWater(this, 1.0f));
-		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
+		this.tasks.addTask(1, new EntityAIBringItemHome(this, 1.0f));
+		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
+		this.tasks.addTask(2, new EntityAIGoHome(this, 1.0f));
 	}
 	
 }

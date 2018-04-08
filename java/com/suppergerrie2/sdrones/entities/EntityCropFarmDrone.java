@@ -1,82 +1,73 @@
 package com.suppergerrie2.sdrones.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.suppergerrie2.sdrones.entities.AI.EntityAIGoHome;
-import com.suppergerrie2.sdrones.entities.AI.treefarm.EntityAICutTree;
-import com.suppergerrie2.sdrones.entities.AI.treefarm.EntityAIPlantSapling;
+import com.suppergerrie2.sdrones.entities.AI.cropfarm.EntityAIFarmCrop;
+import com.suppergerrie2.sdrones.entities.AI.cropfarm.EntityAIPlantCrop;
+import com.suppergerrie2.sdrones.entities.AI.cropfarm.EntityAIPrepareFarmland;
 import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
 import com.suppergerrie2.sdrones.networking.ItemsInDroneMessage;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
-import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
-public class EntityTreeFarmDrone extends EntityBasicDrone {
+public class EntityCropFarmDrone extends EntityBasicDrone {
 
-	public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing,
+	public EntityCropFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing,
 			int carrySize) {
 		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-		this.setRange(16);
+		((PathNavigateGround)this.getNavigator()).setCanSwim(true);
 	}
 
-	public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
+	public EntityCropFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this(worldIn, x, y, z, spawnedWith, facing, 1);
 	}
 
-	public EntityTreeFarmDrone(World worldIn) {
+	public EntityCropFarmDrone(World worldIn) {
 		this(worldIn, -1, -1, -1, ItemStack.EMPTY, EnumFacing.UP);
 	}
 
 	@Override
 	protected void initEntityAI() {
-		this.tasks.addTask(0, new EntityAIPlantSapling(this, 1.0f, this.getRange()));
-		this.tasks.addTask(0, new EntityAICutTree(this, 1.0f, this.getRange()));
-		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
-		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
+		//13
+		int range = 4;
+		this.tasks.addTask(0, new EntityAIPrepareFarmland(this, 1.0f, range));
+		this.tasks.addTask(1, new EntityAIPlantCrop(this, 1.0f, range));
+		this.tasks.addTask(2, new EntityAIFarmCrop(this, 1.0f, range));
+		this.tasks.addTask(3, new EntityAIGoHome(this, 1.0f));
+		this.tasks.addTask(4, new EntityAIWanderAvoidWater(this, 1.0f));
 	}
 
 	public ItemStack getWeapon() {
-		return new ItemStack(Items.DIAMOND_AXE);
+		return new ItemStack(Items.DIAMOND_HOE);
 	}
 
 	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if(!this.world.isRemote) {
-			if(!this.hasSapling()&&this.getDistanceSq(this.getHomePosition())<4) {
-				this.tryGetSapling(this.getHomePosition());
-			}
-
-			for(int x = -1; x <= 1; x++) {
-				for(int y = -1; y <= 1; y++) {
-					if(this.world.getBlockState(getPosition().add(x,0,y)).getBlock() instanceof BlockLeaves) {
-						this.world.destroyBlock(getPosition().add(x,0,y), true);
-					}
-				}
+			if(!this.hasSeeds()&&this.getDistanceSq(this.getHomePosition())<4) {
+				this.tryGetSeeds(this.getHomePosition());
 			}
 		}
 	}
 
-	boolean hasSapling() {
+	boolean hasSeeds() {
 		for(ItemStack stack : getItemStacksInDrone()) {
 			if(stack!=null&&!stack.isEmpty()) {
-				if(Block.getBlockFromItem(stack.getItem()) instanceof BlockSapling) {
+				if(stack.getItem() instanceof IPlantable) {
 					return true;
 				}
 			}
@@ -85,7 +76,7 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 		return false;
 	}
 
-	public boolean tryGetSapling(BlockPos pos) {
+	public boolean tryGetSeeds(BlockPos pos) {
 
 		if(!this.canPickupItem()) {
 			return false;
@@ -100,7 +91,7 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 			IItemHandler itemHandler = destinationResult.getKey();
 
-			ItemStack pickedUp = this.tryGetSaplingFromInventory(itemHandler);
+			ItemStack pickedUp = this.tryGetSeedsFromInventory(itemHandler);
 
 			for(int i = 0; i < getItemStacksInDrone().length; i++) {
 				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
@@ -131,92 +122,61 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 		return (ItemStack.areItemsEqual(a, b)&&b.getMaxStackSize()>b.getCount());
 	}
 
-	private ItemStack tryGetSaplingFromInventory(IItemHandler dest) {
+	private ItemStack tryGetSeedsFromInventory(IItemHandler dest) {
 		ItemStack result = ItemStack.EMPTY;
 		for(int slot = 0; slot < dest.getSlots() && result.isEmpty(); slot++) {
-			if(Block.getBlockFromItem(dest.extractItem(slot, 1, true).getItem()) instanceof BlockSapling) {
+			if(dest.extractItem(slot, 1, true).getItem() instanceof IPlantable) {
 				result = dest.extractItem(slot, dest.getSlotLimit(slot), false);
 			};
 		}
 		return result;
 	}
 
-	public ItemStack getSapling() {
+	public ItemStack getSeeds() {
 		ItemStack[] stacks = this.getItemStacksInDrone();
 		for(int i = 0; i < stacks.length; i++) {
 			if(stacks[i].isEmpty()) {
 				continue;
 			}
 
-			if(Block.getBlockFromItem(stacks[i].getItem()) instanceof BlockSapling){
+			if(stacks[i].getItem() instanceof IPlantable){
 				return stacks[i];
 			}
 		}
 		return ItemStack.EMPTY;
 	}
 
-	public void useSapling() {
+	public void useSeeds() {
 		ItemStack[] stacks = this.getItemStacksInDrone();
 		for(int i = 0; i < stacks.length; i++) {
 			if(stacks[i].isEmpty()) {
 				continue;
 			}
 
-			if(Block.getBlockFromItem(stacks[i].getItem()) instanceof BlockSapling){
+			if(stacks[i].getItem() instanceof IPlantable){
 				stacks[i].shrink(1);
 			}
 		}
 		this.setItemStacksInDrone(stacks);;
 	}
 
-	public boolean placeSapling(BlockPos destination) {
-		ItemStack sapling = this.getSapling();
+	public boolean plantSeeds(BlockPos destination) {
+		ItemStack seeds = this.getSeeds();
 
-		if(sapling.isEmpty()) {
+		if(seeds.isEmpty()) {
 			return false;
 		}
 
-		Block blockToPlace = Block.getBlockFromItem(sapling.getItem());
-		IBlockState blockstate = blockToPlace.getStateForPlacement(world, destination, EnumFacing.DOWN, 8, 8, 8, sapling.getMetadata(), this, EnumHand.MAIN_HAND);
+		IBlockState blockstate = ((IPlantable)seeds.getItem()).getPlant(world, destination);
 
 		world.setBlockState(destination, blockstate);
 
-		this.useSapling();
+		this.useSeeds();
 
 		return true;
 	}
 
-	public void cutTree(BlockPos destination) {
-		List<BlockPos> treePositions = new ArrayList<BlockPos>();
-
-		treePositions.add(destination);
-
-		while(walkTree(treePositions));
-
-		for(BlockPos pos : treePositions) {
-			world.destroyBlock(pos, true);
-		}
-	}
-
-	public boolean walkTree(List<BlockPos> positions) {
-
-		boolean modified = false;
-		List<BlockPos> copy = new ArrayList<BlockPos>(positions);
-		for(BlockPos pos : copy) {
-			for(int x = -1; x <= 1; x++) {
-				for(int z = -1; z <= 1; z++) {
-					for(int y = 0; y <= 1; y++) {
-						BlockPos pos2 = pos.add(x,y,z);
-
-						if(!positions.contains(pos2)&&this.world.getBlockState(pos2).getBlock().isWood(world, pos2)) {
-							positions.add(pos2);
-							modified = true;
-						}
-					}
-				}
-			}
-		}
-
-		return modified;
+	public void farmCrop(BlockPos destination) {
+		world.destroyBlock(destination, true);
 	}
 }

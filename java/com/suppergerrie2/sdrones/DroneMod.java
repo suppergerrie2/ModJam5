@@ -3,6 +3,7 @@ package com.suppergerrie2.sdrones;
 import org.apache.logging.log4j.Logger;
 
 import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
+import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
 import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
 import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
 import com.suppergerrie2.sdrones.entities.EntityTreeFarmDrone;
@@ -32,7 +33,6 @@ public class DroneMod {
 	
 	static int entityID = 0;
 
-	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
@@ -40,6 +40,7 @@ public class DroneMod {
 		registerDrone(EntityHaulerDrone.class, "hauler_drone");
 		registerDrone(EntityFighterDrone.class, "fighter_drone");
 		registerDrone(EntityTreeFarmDrone.class, "tree_farm_drone");
+		registerDrone(EntityCropFarmDrone.class, "crop_farm_drone");
 
 		proxy.preInit(event);
 		logger.info("preInit");

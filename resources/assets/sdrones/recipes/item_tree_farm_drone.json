@@ -1,15 +1,18 @@
 {
-   "type":"minecraft:crafting_shapeless",
-   "ingredients":[
-      {
-         "item":"minecraft:diamond_axe"
-      },
-      {
-         "item":"sdrones:item_hauler_drone"
-      }
-   ],
-   "result":{
-      "item":"sdrones:item_tree_farm_drone",
-      "count":1
-   }
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ad"
+    ],
+    "key": {
+        "d": {
+            "item": "sdrones:item_hauler_drone"
+        },
+        "a": {
+            "item": "minecraft:diamond_axe"
+        }
+    },
+    "result": {
+        "item": "sdrones:item_tree_farm_drone",
+        "count": 1
+    }
 }

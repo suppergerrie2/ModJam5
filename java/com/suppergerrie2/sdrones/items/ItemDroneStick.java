@@ -80,6 +80,11 @@ public class ItemDroneStick extends ItemBasic {
 		}
 	}
 
+	@Override
+	public int getItemStackLimit(ItemStack stack) {
+		return 1;
+	}
 
+	
 
 }
