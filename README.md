@@ -15,6 +15,6 @@ This mod also adds a drone stick this can do a couple different things:
 TODO:
 - [x] Filter
 - [x] Carry upgrade
-- [] Mining drone
-- [] Transport drone
-- [] Crop farm drone
+- [ ] Mining drone
+- [ ] Transport drone
+- [ ] Crop farm drone
