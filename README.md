@@ -11,3 +11,10 @@ This mod also adds a drone stick this can do a couple different things:
 1. Select drones by right clicking on them (Deselect by shift-rightclicking in air)
 2. Set home of selected drones by right clicking on block.
 3. Kill drone by shift-right clicking on drone.
+
+TODO:
+- [x] Filter
+- [x] Carry upgrade
+- [] Mining drone
+- [] Transport drone
+- [] Crop farm drone
