@@ -17,4 +17,4 @@ TODO:
 - [x] Carry upgrade
 - [ ] Mining drone
 - [ ] Transport drone
-- [ ] Crop farm drone
+- [x] Crop farm drone
