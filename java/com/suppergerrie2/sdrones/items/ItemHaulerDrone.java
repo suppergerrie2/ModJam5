@@ -33,8 +33,6 @@ public class ItemHaulerDrone extends ItemDrone {
 			stack.setCount(1);
 			EntityHaulerDrone entitydrone = new EntityHaulerDrone(worldIn, pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing, this.getStorageUpgrade(itemstack)+1);
 			
-			System.out.println(this.getStorageUpgrade(stack));
-			
 			if(this.hasFilter(stack)) {
 				entitydrone.setFilter(this.getFilter(itemstack));
 			}

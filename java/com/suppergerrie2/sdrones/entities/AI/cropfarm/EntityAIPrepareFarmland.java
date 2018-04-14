@@ -16,20 +16,24 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 
 	BlockPos destination;
 	boolean water = true;
+	boolean prepared = false;
+	EntityAIPrepareLand aiPrepareLand;
 	
-	public EntityAIPrepareFarmland(EntityCropFarmDrone entityCropFarmDrone, float speed, int range) {
+	public EntityAIPrepareFarmland(EntityCropFarmDrone entityCropFarmDrone, float speed, int range, EntityAIPrepareLand aiPrepareLand) {
 		this.drone = entityCropFarmDrone;
 		this.speed = speed;
 		this.range = range;
+		this.aiPrepareLand = aiPrepareLand;
 		this.setMutexBits(7);
 	}
 
 	@Override
 	public boolean shouldExecute() {
-		return this.searchUnpreparedFarm();
+		return this.searchUnpreparedFarm()&&aiPrepareLand.isDone();
 	}
 
 	boolean searchUnpreparedFarm() {
+		prepared = true;
 		return (this.searchUnpreparedWater() || this.searchUnpreparedFarmland());
 	}
 
@@ -65,6 +69,10 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 		}
 	}
 	
+	public boolean isPrepared() {
+		return prepared;
+	}
+	
 	boolean isBlockPrepared(BlockPos pos) {
 		if(water) {
 			return drone.world.getBlockState(pos).getBlock() == Blocks.WATER;
@@ -88,6 +96,7 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 				if (!blockstate.getBlock().equals(Blocks.WATER)&&!blockstate.getBlock().equals(Blocks.FLOWING_WATER)) {
 					destination = pos;
 					water = true;
+					prepared = false;
 					return true;
 				}
 			}
@@ -108,6 +117,7 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 				if (!blockstate.getBlock().equals(Blocks.FARMLAND)) {
 					destination = pos;
 					water = false;
+					prepared = false;
 					return true;
 				}
 			}

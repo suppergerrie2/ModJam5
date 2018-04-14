@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.suppergerrie2.sdrones.entities.particles.HomeParticle;
 import com.suppergerrie2.sdrones.init.ModSoundEvents;
 import com.suppergerrie2.sdrones.items.ItemDroneStick;
 import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
@@ -15,7 +14,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
@@ -42,8 +40,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 	List<ItemStack> filter = new ArrayList<ItemStack>();
 	
-//	@Deprecated
-//	int carrySize;
 	int carryLevel = 1;
 	EnumFacing homeFacing;
 	boolean selected = false;
@@ -208,7 +204,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		this.setGlowing(selected);
 
 		if(this.selected) {
-			BlockPos home = this.getHomePosition();
+//			BlockPos home = this.getHomePosition();
 //			Minecraft.getMinecraft().effectRenderer.addEffect(new HomeParticle(world, home.getX()+0.5, home.getY(), home.getZ()+0.5, 1, 1, 1));
 		}
 	}

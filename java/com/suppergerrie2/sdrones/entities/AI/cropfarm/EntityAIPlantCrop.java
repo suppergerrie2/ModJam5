@@ -25,7 +25,7 @@ public class EntityAIPlantCrop extends EntityAIBase {
 
 	@Override
 	public boolean shouldExecute() {
-		return this.searchEmptyFarmland()&&this.drone.hasItems();
+		return this.searchEmptyFarmland()&&this.drone.hasSeeds()&&this.drone.aiPrepareFarmLand.isPrepared();
 	}
 	
 	@Override
@@ -61,7 +61,7 @@ public class EntityAIPlantCrop extends EntityAIBase {
 				BlockPos pos = homepos.add(xOffset, -1, zOffset);
 
 				IBlockState blockstate = drone.world.getBlockState(pos);
-				if (blockstate.getBlock().equals(Blocks.FARMLAND)&&this.drone.world.isAirBlock(pos.up())) {
+				if (blockstate.getBlock().equals(Blocks.FARMLAND)&&(this.drone.world.isAirBlock(pos.up())||drone.world.getBlockState(pos.up()).getBlock().isReplaceable(drone.world, pos.up()))) {
 					destination = pos.up();
 					return true;
 				}

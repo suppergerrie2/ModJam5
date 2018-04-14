@@ -45,8 +45,8 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 	@Override
 	protected void initEntityAI() {
-		this.tasks.addTask(0, new EntityAIPlantSapling(this, 1.0f, this.getRange()));
-		this.tasks.addTask(0, new EntityAICutTree(this, 1.0f, this.getRange()));
+		this.tasks.addTask(0, new EntityAIPlantSapling(this, 1.0f, 16));
+		this.tasks.addTask(0, new EntityAICutTree(this, 1.0f, 16));
 		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
 	}
@@ -134,7 +134,7 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 	private ItemStack tryGetSaplingFromInventory(IItemHandler dest) {
 		ItemStack result = ItemStack.EMPTY;
 		for(int slot = 0; slot < dest.getSlots() && result.isEmpty(); slot++) {
-			if(Block.getBlockFromItem(dest.extractItem(slot, 1, true).getItem()) instanceof BlockSapling) {
+			if(Block.getBlockFromItem(dest.extractItem(slot, 1, true).getItem()) instanceof BlockSapling && this.canPickupItem(dest.extractItem(slot, 1, true))) {
 				result = dest.extractItem(slot, dest.getSlotLimit(slot), false);
 			};
 		}
