@@ -13,4 +13,9 @@ entity.crop_farm_drone.name=Crop Farm Drone
 sdrones.subtitle.drone_bleep=Drone bleeps
 sdrones.subtitle.drone_driving=Drone is driving
 
+dronestick.message.select=Right click to select drone.
+dronestick.message.deselect=Shift+Right click in air to deselect drones.
+dronestick.message.kill=Shift+Right on drone to kill drone.
+dronestick.message.sethome=Right click on block to set home.
+
 itemGroup.tabDronesMod=Drones

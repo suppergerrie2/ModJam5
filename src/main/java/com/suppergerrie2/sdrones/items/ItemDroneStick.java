@@ -13,6 +13,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.world.World;
 
 public class ItemDroneStick extends ItemBasic {
@@ -69,13 +70,13 @@ public class ItemDroneStick extends ItemBasic {
 		
 		if(worldIn!=null) {
 			if(worldIn.getTotalWorldTime()%200<50) {
-				tooltip.add("Right click to select drone.");			
+				tooltip.add(I18n.format("dronestick.message.select"));			
 			} else if(worldIn.getTotalWorldTime()%200<100) {
-				tooltip.add("Shift+Right click in air to deselect drones.");			
+				tooltip.add(I18n.format("dronestick.message.deselect"));			
 			} else if(worldIn.getTotalWorldTime()%200<150) {
-				tooltip.add("Shift+Right on drone to kill drone.");			
+				tooltip.add(I18n.format("dronestick.message.kill"));			
 			} else if(worldIn.getTotalWorldTime()%200<200) {
-				tooltip.add("Right click on block to set home.");			
+				tooltip.add(I18n.format("dronestick.message.sethome"));			
 			}
 		}
 	}
