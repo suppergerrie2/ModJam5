@@ -97,7 +97,7 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
         double d1 = target.getEntityBoundingBox().minY + (double)(target.height / 3.0F) - arrow.posY;
         double d2 = target.posZ - this.posZ;
         double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
-	       
+        
 		arrow.shoot(d0, d1 + d3 * 0.20000000298023224D, d2, 1.5f, 0);
 		this.world.spawnEntity(arrow);
 	}

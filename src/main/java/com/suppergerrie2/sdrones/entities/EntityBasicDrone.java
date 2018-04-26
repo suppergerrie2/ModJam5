@@ -448,7 +448,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 		itemStacksInDrone = stacks;	
 
-		if(sendMessage) DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
+		if(!this.world.isRemote&&sendMessage) DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
 	}
 
 	public void setItemStacksInDrone(int slot, ItemStack stack) {	

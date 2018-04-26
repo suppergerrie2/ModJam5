@@ -3,7 +3,7 @@
   "modid": "sdrones",
   "name": "Suppergerrie2's Drone Mod",
   "description": "This mod adds tiny drones. Made for ModJam 5",
-  "version": "1.1.0",
+  "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
