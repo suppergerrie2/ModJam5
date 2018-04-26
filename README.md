@@ -1,6 +1,8 @@
 This mod was made for ModJam 5 in three days, so forgive any bugs! 
 To see the code as it was at the end of the ModJam check the [ModJam5 branch](https://github.com/suppergerrie2/ModJam5/tree/ModJam5)
 
+You can also join a discord server [here](https://discord.gg/VHD4Ptm) this server is for suppergerrie2.com but also contains channels for this mod.
+
 Adds three types of drones:
 1. Hauler drone: searches items in the world and brings them to its home.
 2. Fighter drone: fights mobs around it.
