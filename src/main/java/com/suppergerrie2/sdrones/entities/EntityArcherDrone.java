@@ -1,12 +1,12 @@
 package com.suppergerrie2.sdrones.entities;
 
 import com.suppergerrie2.sdrones.entities.AI.EntityAIGoHome;
+import com.suppergerrie2.sdrones.entities.AI.archer.EntityAIAttackRanged;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackRanged;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.monster.EntityMob;
@@ -18,6 +18,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -40,7 +41,7 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
 
 	@Override
 	protected void initEntityAI() {
-		this.tasks.addTask(0, new EntityAIAttackRanged(this, 1.0D, 5, 20.0f));
+		this.tasks.addTask(0, new EntityAIAttackRanged(this, 1.0D, 15, 20.0f));
 		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
 		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, true, true));
@@ -64,8 +65,19 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
 		return entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), 7);
 	}
 	
+	ItemStack weapon = new ItemStack(Items.BOW);
 	public ItemStack getTool() {
-		return new ItemStack(Items.BOW);
+		return weapon;
+	}
+
+	@Override
+	public ItemStack getActiveItemStack() {
+		return this.getTool();
+	}
+	
+	@Override
+	public ItemStack getHeldItem(EnumHand hand) {
+		return this.getTool();
 	}
 	
 	@Override
@@ -86,12 +98,24 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
         double d2 = target.posZ - this.posZ;
         double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
 	       
-		arrow.shoot(d0, d1 + d3 * 0.1D, d2, 1.5f, 0);
+		arrow.shoot(d0, d1 + d3 * 0.20000000298023224D, d2, 1.5f, 0);
 		this.world.spawnEntity(arrow);
 	}
 
 	@Override
 	public void setSwingingArms(boolean swingingArms) {
 	}
+	
+	@Override
+	public boolean attackEntityFrom(DamageSource source, float amount)
+    {
+		Entity entity = source.getImmediateSource();
 
+        if (entity instanceof EntityArrow)
+        {
+            return false;
+        }
+        
+        return super.attackEntityFrom(source, amount);
+    }
 }

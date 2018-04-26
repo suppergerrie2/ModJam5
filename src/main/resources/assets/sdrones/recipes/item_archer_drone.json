@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ad"
+    ],
+    "key": {
+        "d": {
+            "item": "sdrones:item_hauler_drone"
+        },
+        "a": {
+            "item": "minecraft:bow"
+        }
+    },
+    "result": {
+        "item": "sdrones:item_archer_drone",
+        "count": 1
+    }
+}

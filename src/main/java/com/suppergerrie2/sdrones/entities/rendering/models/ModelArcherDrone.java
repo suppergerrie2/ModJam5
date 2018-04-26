@@ -67,21 +67,21 @@ public class ModelArcherDrone extends ModelBase {
 		GlStateManager.scale(0.75D, 0.75D, 0.75D);
 		GlStateManager.translate(0.2, 1.7, -0.1);
 		GlStateManager.rotate(180, 0, 0, 1);
-		GlStateManager.rotate((float) (Math.sin(entity.ticksExisted%20/20f*Math.PI*2)*10f)-90, 1, 0, 0);
+		GlStateManager.rotate(-45, 1, 0, 0);
 		GlStateManager.rotate(270, 0, 1, 0);
 		
 		ItemStack weapon = ((EntityArcherDrone)entity).getTool();
 
-		renderItemStack(weapon, entity.world);
+		renderItemStack(weapon, entity.world, (EntityArcherDrone)entity);
 		
 		GlStateManager.popMatrix();
 
 	}
 
-	public void renderItemStack(ItemStack stack, World world) {
+	public void renderItemStack(ItemStack stack, World world, EntityArcherDrone entity) {
 		GlStateManager.pushMatrix();
 
-		IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, world, null);
+		IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, world, entity);
 		model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GROUND, false);
 
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);

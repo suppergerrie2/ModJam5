@@ -2,6 +2,7 @@ item.item_hauler_drone.name=Hauler Drone
 item.item_fighter_drone.name=Fighter Drone
 item.item_tree_farm_drone.name=Tree Farm Drone
 item.item_crop_farm_drone.name=Crop Farm Drone
+item.item_archer_drone.name=Archer Drone
 
 item.drone_stick.name=Drone Stick
 

@@ -1,6 +1,7 @@
 package com.suppergerrie2.sdrones.init;
 
 import com.suppergerrie2.sdrones.Reference;
+import com.suppergerrie2.sdrones.items.ItemArcherDrone;
 import com.suppergerrie2.sdrones.items.ItemCropFarmDrone;
 import com.suppergerrie2.sdrones.items.ItemDroneStick;
 import com.suppergerrie2.sdrones.items.ItemFighterDrone;
@@ -27,6 +28,7 @@ public class ModItems {
 	public static Item itemFighterDrone;
 	public static Item itemTreeFarmDrone;
 	public static Item itemCropFarmDrone;
+	public static Item itemArcherDrone;
 	
 	public static Item droneStick;
 	
@@ -49,6 +51,7 @@ public class ModItems {
 		itemFighterDrone = new ItemFighterDrone("item_fighter_drone");
 		itemTreeFarmDrone = new ItemTreeFarmDrone("item_tree_farm_drone");
 		itemCropFarmDrone = new ItemCropFarmDrone("item_crop_farm_drone");
+		itemArcherDrone = new ItemArcherDrone("item_archer_drone");
 		
 		droneStick = new ItemDroneStick("drone_stick");
 	}
@@ -57,7 +60,7 @@ public class ModItems {
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		init();
 		
-		event.getRegistry().registerAll(itemHaulerDrone, itemFighterDrone, droneStick, itemTreeFarmDrone, itemCropFarmDrone);
+		event.getRegistry().registerAll(itemHaulerDrone, itemFighterDrone, droneStick, itemTreeFarmDrone, itemCropFarmDrone, itemArcherDrone);
 	}
 	
 	@SubscribeEvent
@@ -66,6 +69,7 @@ public class ModItems {
 		registerRender(itemFighterDrone);
 		registerRender(itemTreeFarmDrone);
 		registerRender(itemCropFarmDrone);
+		registerRender(itemArcherDrone);
 		
 		registerRender(droneStick);
 	}
