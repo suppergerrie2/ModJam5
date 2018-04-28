@@ -1,14 +1,19 @@
 package com.suppergerrie2.sdrones.entities;
 
+import javax.annotation.Nullable;
+
+import com.google.common.base.Predicate;
 import com.suppergerrie2.sdrones.entities.AI.EntityAIGoHome;
 import com.suppergerrie2.sdrones.entities.AI.archer.EntityAIAttackRanged;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntityShulker;
 import net.minecraft.entity.monster.EntitySlime;
@@ -44,7 +49,13 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
 		this.tasks.addTask(0, new EntityAIAttackRanged(this, 1.0D, 15, 20.0f));
 		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
-		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, true, true));
+		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, true, new Predicate<EntityLiving>()
+        {
+            public boolean apply(@Nullable EntityLiving possibleTarget)
+            {
+                return possibleTarget != null && !(possibleTarget instanceof EntityCreeper);
+            }
+        }));
 		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntitySlime>(this, EntitySlime.class, true, true));
 		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityShulker>(this, EntityShulker.class, true, true));
 	}
