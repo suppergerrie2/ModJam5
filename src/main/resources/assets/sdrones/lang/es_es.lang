@@ -13,4 +13,9 @@ entity.crop_farm_drone.name=Dron cultivador
 sdrones.subtitle.drone_bleep=Dron beep
 sdrones.subtitle.drone_driving=Drone esta ocupado
 
+dronestick.message.select=Right click para seleccionar un drone.
+dronestick.message.deselect=Shift+Right click en el aire para desseleccionar los drones.
+dronestick.message.kill=Shift+Right en un dron para recuperarlo
+dronestick.message.sethome=click derecho para establecer el hogar
+
 itemGroup.tabDronesMod=Drones
