@@ -3,6 +3,8 @@ To see the code as it was at the end of the ModJam check the [ModJam5 branch](ht
 
 You can also join a discord server [here](https://discord.gg/VHD4Ptm) this server is for suppergerrie2.com but also contains channels for this mod.
 
+Download the mod at the [curseforge page](https://minecraft.curseforge.com/projects/suppergerrie2s-drone-mod).
+
 Adds five types of drones:
 1. Hauler drone: searches items in the world and brings them to its home.
 2. Fighter drone: fights mobs around it.
