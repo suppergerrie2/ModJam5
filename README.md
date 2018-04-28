@@ -3,10 +3,12 @@ To see the code as it was at the end of the ModJam check the [ModJam5 branch](ht
 
 You can also join a discord server [here](https://discord.gg/VHD4Ptm) this server is for suppergerrie2.com but also contains channels for this mod.
 
-Adds three types of drones:
+Adds five types of drones:
 1. Hauler drone: searches items in the world and brings them to its home.
 2. Fighter drone: fights mobs around it.
 3. Tree farm drone: plants trees and chops them down.
+4. Crop farm drone: prepares farmland, plants seeds and breaks them when fully grown.
+5. Archer drone: shoots hostile mobs that come to close to it.
 It sets it home where you place it. 
 
 This mod also adds a drone stick this can do a couple different things:
