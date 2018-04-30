@@ -10,6 +10,8 @@ entity.hauler_drone.name=Hauler Drone
 entity.fighter_drone.name=Fighter Drone
 entity.tree_farm_drone.name=Tree Farm Drone
 entity.crop_farm_drone.name=Crop Farm Drone
+entity.archer_drone.name=Archer Drone
+entity.drone_arrow.name=Arrow
 
 sdrones.subtitle.drone_bleep=Drone bleeps
 sdrones.subtitle.drone_driving=Drone is driving

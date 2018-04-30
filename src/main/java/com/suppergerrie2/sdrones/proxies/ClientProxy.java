@@ -1,11 +1,13 @@
 package com.suppergerrie2.sdrones.proxies;
 
+import com.suppergerrie2.sdrones.entities.EntityDroneArrow;
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
 import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
 import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
 import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
 import com.suppergerrie2.sdrones.entities.EntityTreeFarmDrone;
 import com.suppergerrie2.sdrones.entities.rendering.RenderArcherDrone;
+import com.suppergerrie2.sdrones.entities.rendering.RenderCustomArrow;
 import com.suppergerrie2.sdrones.entities.rendering.RenderDrone;
 
 import net.minecraft.client.renderer.entity.Render;
@@ -52,12 +54,19 @@ public class ClientProxy implements IProxy {
 			}
 		});
 		
-		//TODO: Fix bow rendering
 		RenderingRegistry.registerEntityRenderingHandler(EntityArcherDrone.class, new IRenderFactory<EntityArcherDrone>() {
 
 			@Override
 			public Render<? super EntityArcherDrone> createRenderFor(RenderManager manager) {
 				return new RenderArcherDrone(manager);
+			}
+		});
+		
+		RenderingRegistry.registerEntityRenderingHandler(EntityDroneArrow.class, new IRenderFactory<EntityDroneArrow>() {
+
+			@Override
+			public Render<? super EntityDroneArrow> createRenderFor(RenderManager manager) {
+				return new RenderCustomArrow(manager);
 			}
 		});
 	}

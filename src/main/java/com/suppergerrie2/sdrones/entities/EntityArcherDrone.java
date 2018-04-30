@@ -18,7 +18,6 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntityShulker;
 import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
@@ -103,7 +102,8 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
 
 	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase target, float distanceFactor) {
-		EntityArrow arrow = new EntityTippedArrow(this.world, this);
+		EntityArrow arrow = new EntityDroneArrow(this.world, this);
+		arrow.posY+=0.1;
 		double d0 = target.posX - this.posX;
         double d1 = target.getEntityBoundingBox().minY + (double)(target.height / 3.0F) - arrow.posY;
         double d2 = target.posZ - this.posZ;
@@ -117,16 +117,16 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
 	public void setSwingingArms(boolean swingingArms) {
 	}
 	
-	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount)
-    {
-		Entity entity = source.getImmediateSource();
-
-        if (entity instanceof EntityArrow)
-        {
-            return false;
-        }
-        
-        return super.attackEntityFrom(source, amount);
-    }
+//	@Override
+//	public boolean attackEntityFrom(DamageSource source, float amount)
+//    {
+//		Entity entity = source.getImmediateSource();
+//
+//        if (entity instanceof EntityArrow)
+//        {
+//            return false;
+//        }
+//        
+//        return super.attackEntityFrom(source, amount);
+//    }
 }

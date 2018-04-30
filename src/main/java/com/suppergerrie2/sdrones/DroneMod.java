@@ -2,6 +2,7 @@ package com.suppergerrie2.sdrones;
 
 import org.apache.logging.log4j.Logger;
 
+import com.suppergerrie2.sdrones.entities.EntityDroneArrow;
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
 import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
 import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
@@ -43,7 +44,9 @@ public class DroneMod {
 		registerDrone(EntityTreeFarmDrone.class, "tree_farm_drone");
 		registerDrone(EntityCropFarmDrone.class, "crop_farm_drone");
 		registerDrone(EntityArcherDrone.class, "archer_drone");
-
+		
+		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, "drone_arrow"), EntityDroneArrow.class, "drone_arrow", entityID++, this, 80, 1, true);
+		
 		proxy.preInit(event);
 		logger.info("preInit");
 	}
