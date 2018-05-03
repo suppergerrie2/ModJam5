@@ -3,8 +3,6 @@ package com.suppergerrie2.sdrones.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.suppergerrie2.sdrones.entities.AI.EntityAIGoHome;
 import com.suppergerrie2.sdrones.entities.AI.treefarm.EntityAICutTree;
 import com.suppergerrie2.sdrones.entities.AI.treefarm.EntityAIPlantSapling;
@@ -12,7 +10,6 @@ import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
 import com.suppergerrie2.sdrones.networking.ItemsInDroneMessage;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
@@ -20,12 +17,13 @@ import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
 public class EntityTreeFarmDrone extends EntityBasicDrone {
 
@@ -90,39 +88,51 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 		if(!this.canPickupItem()) {
 			return false;
 		}
+		
+		IItemHandler itemHandler = null;
 
-		IBlockState iblockstate = world.getBlockState(pos);
-		if(iblockstate.getBlock() instanceof BlockContainer) {
-			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
-			if(destinationResult==null) {
-				return false;
-			} 
+		TileEntity tileentity = world.getTileEntity(pos);
+		if (tileentity != null)
+		{
+			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, this.homeFacing);
+			
+			if(itemHandler!=null) {
+				ItemStack pickedUp = this.tryGetSaplingFromInventory(itemHandler);
 
-			IItemHandler itemHandler = destinationResult.getKey();
-
-			ItemStack pickedUp = this.tryGetSaplingFromInventory(itemHandler);
-
-			for(int i = 0; i < getItemStacksInDrone().length; i++) {
-				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
-					getItemStacksInDrone()[i] = pickedUp;
-					DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
-					return true;
-				} else if(getItemStacksInDrone()[i]!=null&&this.couldFitItem(pickedUp, getItemStacksInDrone()[i])) {
-					int count = getItemStacksInDrone()[i].getCount();
-					count+=pickedUp.getCount();
-					if(count>getItemStacksInDrone()[i].getMaxStackSize()) {
-						pickedUp.setCount(count-getItemStacksInDrone()[i].getMaxStackSize());
+				for(int i = 0; i < getItemStacksInDrone().length; i++) {
+					if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
+						getItemStacksInDrone()[i] = pickedUp;
+						DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
+						return true;
+					} else if(getItemStacksInDrone()[i]!=null&&this.couldFitItem(pickedUp, getItemStacksInDrone()[i])) {
+						int count = getItemStacksInDrone()[i].getCount();
+						count+=pickedUp.getCount();
+						if(count>getItemStacksInDrone()[i].getMaxStackSize()) {
+							pickedUp.setCount(count-getItemStacksInDrone()[i].getMaxStackSize());
+						}
 					}
 				}
+				ItemStack rest = this.tryPutInInventory(pickedUp, itemHandler);
+
+				EntityItem item = new EntityItem(world, this.posX, this.posY, this.posZ, rest);
+				world.spawnEntity(item);
 			}
-			ItemStack rest = this.tryPutInInventory(pickedUp, itemHandler);
-
-			EntityItem item = new EntityItem(world, this.posX, this.posY, this.posZ, rest);
-			world.spawnEntity(item);
-
-		} else {
-			return false;
 		}
+
+//		IBlockState iblockstate = world.getBlockState(pos);
+//		if(iblockstate.getBlock() instanceof BlockContainer) {
+//			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
+//			if(destinationResult==null) {
+//				return false;
+//			} 
+//
+//			IItemHandler itemHandler = destinationResult.getKey();
+//
+//			
+//
+//		} else {
+//			return false;
+//		}
 
 		return false;
 	}

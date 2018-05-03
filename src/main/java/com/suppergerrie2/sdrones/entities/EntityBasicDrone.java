@@ -3,9 +3,6 @@ package com.suppergerrie2.sdrones.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.suppergerrie2.sdrones.init.ModSoundEvents;
 import com.suppergerrie2.sdrones.items.ItemDroneStick;
 import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
@@ -13,8 +10,6 @@ import com.suppergerrie2.sdrones.networking.ItemsInDroneMessage;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
@@ -34,7 +29,6 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
 public abstract class EntityBasicDrone extends EntityCreature implements IEntityAdditionalSpawnData {
 
@@ -206,12 +200,22 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	public void onUpdate() {
 		super.onUpdate();
 		this.setGlowing(selected);
-
+		
+		this.pushOutOfBlocks(this.posX, (this.getEntityBoundingBox().minY + this.getEntityBoundingBox().maxY) / 2.0D, this.posZ);
+		
 		if(this.selected) {
 			//			BlockPos home = this.getHomePosition();
 			//			Minecraft.getMinecraft().effectRenderer.addEffect(new HomeParticle(world, home.getX()+0.5, home.getY(), home.getZ()+0.5, 1, 1, 1));
 		}
 	}
+	
+	public boolean attackEntityFrom(DamageSource source, float amount)
+    {
+		if(source==DamageSource.IN_WALL&&this.ticksExisted<40) {
+			return false;
+		}
+		return super.attackEntityFrom(source, amount);
+    }
 
 	public boolean pickupItem(EntityItem item) {
 		if(!item.cannotPickup()&&canPickupItem(item.getItem())) {
@@ -237,7 +241,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		TileEntity tileentity = world.getTileEntity(pos);
 		if (tileentity != null)
 		{
-			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
+			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, this.homeFacing);
 			
 			if(itemHandler!=null) {
 				for(int i = 0; i < getItemStacksInDrone().length; i++) {
@@ -255,32 +259,30 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		return true;
 	}
 
+	//For some reason this isn't used and every drone reimplements this? Have to look into this.
 	public boolean tryGetItem(Class<? extends Item> itemType, BlockPos pos) {
 
 		if(!this.canPickupItem(ItemStack.EMPTY)) {
 			return false;
 		}
 
-		IBlockState iblockstate = world.getBlockState(pos);
-		if(iblockstate.getBlock() instanceof BlockContainer) {
-			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
-			if(destinationResult==null) {
-				return false;
-			} 
+		IItemHandler itemHandler = null;
 
-			IItemHandler itemHandler = destinationResult.getKey();
+		TileEntity tileentity = world.getTileEntity(pos);
+		if (tileentity != null)
+		{
+			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, this.homeFacing);
+			
+			if(itemHandler!=null) {
+				ItemStack pickedUp = this.tryGetFromInventory(itemType, itemHandler);
 
-			ItemStack pickedUp = this.tryGetFromInventory(itemType, itemHandler);
-
-			for(int i = 0; i < getItemStacksInDrone().length; i++) {
-				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
-					this.setItemStacksInDrone(i, pickedUp);
-					return true;
+				for(int i = 0; i < getItemStacksInDrone().length; i++) {
+					if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
+						this.setItemStacksInDrone(i, pickedUp);
+						return true;
+					}
 				}
 			}
-
-		} else {
-			return false;
 		}
 
 		return false;

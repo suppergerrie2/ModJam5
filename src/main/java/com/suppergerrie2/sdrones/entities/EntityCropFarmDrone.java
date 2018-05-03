@@ -19,10 +19,12 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
@@ -118,38 +120,50 @@ public class EntityCropFarmDrone extends EntityBasicDrone {
 			return false;
 		}
 
-		IBlockState iblockstate = world.getBlockState(pos);
-		if(iblockstate.getBlock() instanceof BlockContainer) {
-			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
-			if(destinationResult==null) {
-				return false;
-			} 
+		IItemHandler itemHandler = null;
 
-			IItemHandler itemHandler = destinationResult.getKey();
-
-			ItemStack pickedUp = this.tryGetSeedsFromInventory(itemHandler);
+		TileEntity tileentity = world.getTileEntity(pos);
+		if (tileentity != null)
+		{
+			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, this.homeFacing);
 			
-			for(int i = 0; i < getItemStacksInDrone().length; i++) {
-				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
-					getItemStacksInDrone()[i] = pickedUp;
-					DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
-					return true;
-				} else if(getItemStacksInDrone()[i]!=null&&this.couldFitItem(pickedUp, getItemStacksInDrone()[i])) {
-					int count = getItemStacksInDrone()[i].getCount();
-					count+=pickedUp.getCount();
-					if(count>getItemStacksInDrone()[i].getMaxStackSize()) {
-						pickedUp.setCount(count-getItemStacksInDrone()[i].getMaxStackSize());
+			if(itemHandler!=null) {
+				ItemStack pickedUp = this.tryGetSeedsFromInventory(itemHandler);
+				
+				for(int i = 0; i < getItemStacksInDrone().length; i++) {
+					if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
+						getItemStacksInDrone()[i] = pickedUp;
+						DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
+						return true;
+					} else if(getItemStacksInDrone()[i]!=null&&this.couldFitItem(pickedUp, getItemStacksInDrone()[i])) {
+						int count = getItemStacksInDrone()[i].getCount();
+						count+=pickedUp.getCount();
+						if(count>getItemStacksInDrone()[i].getMaxStackSize()) {
+							pickedUp.setCount(count-getItemStacksInDrone()[i].getMaxStackSize());
+						}
 					}
 				}
+				ItemStack rest = this.tryPutInInventory(pickedUp, itemHandler);
+
+				EntityItem item = new EntityItem(world, this.posX, this.posY, this.posZ, rest);
+				world.spawnEntity(item);
 			}
-			ItemStack rest = this.tryPutInInventory(pickedUp, itemHandler);
-
-			EntityItem item = new EntityItem(world, this.posX, this.posY, this.posZ, rest);
-			world.spawnEntity(item);
-
-		} else {
-			return false;
 		}
+		
+//		IBlockState iblockstate = world.getBlockState(pos);
+//		if(iblockstate.getBlock() instanceof BlockContainer) {
+//			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
+//			if(destinationResult==null) {
+//				return false;
+//			} 
+//
+//			IItemHandler itemHandler = destinationResult.getKey();
+//
+//			
+//
+//		} else {
+//			return false;
+//		}
 
 		return false;
 	}
@@ -158,39 +172,51 @@ public class EntityCropFarmDrone extends EntityBasicDrone {
 		if(!this.canPickupItem()) {
 			return false;
 		}
+		
+		IItemHandler itemHandler = null;
+		
+		TileEntity tileentity = world.getTileEntity(pos);
+		if (tileentity != null)
+		{
+			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, this.homeFacing);
+			
+			if(itemHandler!=null) {
+				ItemStack pickedUp = this.tryGetDirtFromInventory(itemHandler);
 
-		IBlockState iblockstate = world.getBlockState(pos);
-		if(iblockstate.getBlock() instanceof BlockContainer) {
-			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
-			if(destinationResult==null) {
-				return false;
-			} 
-
-			IItemHandler itemHandler = destinationResult.getKey();
-
-			ItemStack pickedUp = this.tryGetDirtFromInventory(itemHandler);
-
-			for(int i = 0; i < getItemStacksInDrone().length; i++) {
-				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
-					getItemStacksInDrone()[i] = pickedUp;
-					DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
-					return true;
-				} else if(getItemStacksInDrone()[i]!=null&&this.couldFitItem(pickedUp, getItemStacksInDrone()[i])) {
-					int count = getItemStacksInDrone()[i].getCount();
-					count+=pickedUp.getCount();
-					if(count>getItemStacksInDrone()[i].getMaxStackSize()) {
-						pickedUp.setCount(count-getItemStacksInDrone()[i].getMaxStackSize());
+				for(int i = 0; i < getItemStacksInDrone().length; i++) {
+					if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
+						getItemStacksInDrone()[i] = pickedUp;
+						DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
+						return true;
+					} else if(getItemStacksInDrone()[i]!=null&&this.couldFitItem(pickedUp, getItemStacksInDrone()[i])) {
+						int count = getItemStacksInDrone()[i].getCount();
+						count+=pickedUp.getCount();
+						if(count>getItemStacksInDrone()[i].getMaxStackSize()) {
+							pickedUp.setCount(count-getItemStacksInDrone()[i].getMaxStackSize());
+						}
 					}
 				}
+				ItemStack rest = this.tryPutInInventory(pickedUp, itemHandler);
+
+				EntityItem item = new EntityItem(world, this.posX, this.posY, this.posZ, rest);
+				world.spawnEntity(item);
 			}
-			ItemStack rest = this.tryPutInInventory(pickedUp, itemHandler);
-
-			EntityItem item = new EntityItem(world, this.posX, this.posY, this.posZ, rest);
-			world.spawnEntity(item);
-
-		} else {
-			return false;
 		}
+		
+//		IBlockState iblockstate = world.getBlockState(pos);
+//		if(iblockstate.getBlock() instanceof BlockContainer) {
+//			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.DOWN);
+//			if(destinationResult==null) {
+//				return false;
+//			} 
+//
+//			IItemHandler itemHandler = destinationResult.getKey();
+//
+//			
+//
+//		} else {
+//			return false;
+//		}
 
 		return false;
 	}
