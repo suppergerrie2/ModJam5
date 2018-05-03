@@ -3,6 +3,7 @@ package com.suppergerrie2.sdrones.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.suppergerrie2.sdrones.init.ModSoundEvents;
@@ -22,6 +23,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -30,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
@@ -39,7 +42,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	ItemStack spawnedWith;
 
 	List<ItemStack> filter = new ArrayList<ItemStack>();
-	
+
 	int carryLevel = 1;
 	EnumFacing homeFacing;
 	boolean selected = false;
@@ -68,7 +71,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		this.carryLevel = carryLevel;
 		this.setupItemStacksInDrone();
 	}
-	
+
 	@Override
 	protected abstract void initEntityAI(); 
 
@@ -160,11 +163,11 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	{
 		super.readEntityFromNBT(compound);
 
-//		if(compound.hasKey("CarrySize")) {
-//			carrySize = compound.getInteger("CarrySize");
-//			this.setItemStacksInDrone(new ItemStack[carrySize]);
-//		}
-		
+		//		if(compound.hasKey("CarrySize")) {
+		//			carrySize = compound.getInteger("CarrySize");
+		//			this.setItemStacksInDrone(new ItemStack[carrySize]);
+		//		}
+
 		if(compound.hasKey("CarryLevel")) {
 			carryLevel = compound.getInteger("CarryLevel");
 			this.setItemStacksInDrone(new ItemStack[this.getCarrySize()]);
@@ -205,8 +208,8 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		this.setGlowing(selected);
 
 		if(this.selected) {
-//			BlockPos home = this.getHomePosition();
-//			Minecraft.getMinecraft().effectRenderer.addEffect(new HomeParticle(world, home.getX()+0.5, home.getY(), home.getZ()+0.5, 1, 1, 1));
+			//			BlockPos home = this.getHomePosition();
+			//			Minecraft.getMinecraft().effectRenderer.addEffect(new HomeParticle(world, home.getX()+0.5, home.getY(), home.getZ()+0.5, 1, 1, 1));
 		}
 	}
 
@@ -228,14 +231,28 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		if(world.isAirBlock(pos)) {
 			pos = pos.offset(homeFacing.getOpposite());
 		}
-		
-		Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.UP);
 
-		if(destinationResult==null) {
-			return false;
-		} 
+//		Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.UP);
+//
+//		if(destinationResult==null) {
+//			return false;
+//		} 
 
-		IItemHandler itemHandler = destinationResult.getKey();
+		IItemHandler itemHandler = null;// = destinationResult.getKey();
+
+		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
+
+		if (block.hasTileEntity(state)) {
+			TileEntity tileentity = world.getTileEntity(pos);
+			if (tileentity != null)
+			{
+				if (tileentity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP))
+				{
+					itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
+				}
+			}
+		}
 
 		for(int i = 0; i < getItemStacksInDrone().length; i++) {
 			if(isItemHandlerFull(itemHandler)) {
@@ -425,11 +442,11 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	public void setRange(int range) {
 		this.range = range;
 	}
-	
+
 	public int getRange() {
 		return this.range;
 	}
-	
+
 	public ItemStack[] getItemStacksInDrone() {
 		return itemStacksInDrone;
 	}
@@ -456,7 +473,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	public void setItemStacksInDrone(ItemStack[] stacks) {
 		this.setItemStacksInDrone(stacks, true);
 	}
-	
+
 	public int getCarrySize() {
 		return 2+(this.carryLevel-1);
 	}
@@ -464,7 +481,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	public ItemStack getTool() {
 		return tool;
 	}
-	
+
 	public void setTool(ItemStack tool) {
 		this.tool = tool;
 	}
