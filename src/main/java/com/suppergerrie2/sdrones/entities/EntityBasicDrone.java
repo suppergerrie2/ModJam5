@@ -232,13 +232,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 			pos = pos.offset(homeFacing.getOpposite());
 		}
 
-//		Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.UP);
-//
-//		if(destinationResult==null) {
-//			return false;
-//		} 
-
-		IItemHandler itemHandler = null;// = destinationResult.getKey();
+		IItemHandler itemHandler = null;
 
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
