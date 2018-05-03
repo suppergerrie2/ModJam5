@@ -225,31 +225,26 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	}
 
 	public boolean insertItems(BlockPos pos) {		
-		IBlockState iblockstate;
 		if(world.isAirBlock(pos)) {
 			pos = pos.offset(homeFacing.getOpposite());
 		}
-		iblockstate = world.getBlockState(pos);
-		if(iblockstate.getBlock() instanceof BlockContainer) {
-			Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.UP);
+		
+		Pair<IItemHandler, Object> destinationResult = VanillaInventoryCodeHooks.getItemHandler(world, pos.getX(), pos.getY(), pos.getZ(), EnumFacing.UP);
 
-			if(destinationResult==null) {
-				return false;
-			} 
-
-			IItemHandler itemHandler = destinationResult.getKey();
-
-			for(int i = 0; i < getItemStacksInDrone().length; i++) {
-				if(isItemHandlerFull(itemHandler)) {
-					continue;
-				}
-
-				if(getItemStacksInDrone()[i]!=null&&!getItemStacksInDrone()[i].isEmpty()) {
-					this.setItemStacksInDrone(i, tryPutInInventory(getItemStacksInDrone()[i], itemHandler));
-				}
-			}
-		} else {
+		if(destinationResult==null) {
 			return false;
+		} 
+
+		IItemHandler itemHandler = destinationResult.getKey();
+
+		for(int i = 0; i < getItemStacksInDrone().length; i++) {
+			if(isItemHandlerFull(itemHandler)) {
+				continue;
+			}
+
+			if(getItemStacksInDrone()[i]!=null&&!getItemStacksInDrone()[i].isEmpty()) {
+				this.setItemStacksInDrone(i, tryPutInInventory(getItemStacksInDrone()[i], itemHandler));
+			}
 		}
 
 		return true;
