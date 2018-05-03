@@ -234,27 +234,21 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 		IItemHandler itemHandler = null;
 
-		IBlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-
-		if (block.hasTileEntity(state)) {
-			TileEntity tileentity = world.getTileEntity(pos);
-			if (tileentity != null)
-			{
-				if (tileentity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP))
-				{
-					itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
+		TileEntity tileentity = world.getTileEntity(pos);
+		if (tileentity != null)
+		{
+			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
+			
+			if(itemHandler!=null) {
+				for(int i = 0; i < getItemStacksInDrone().length; i++) {
+					if(isItemHandlerFull(itemHandler)) {
+						continue;
+					}
+	
+					if(getItemStacksInDrone()[i]!=null&&!getItemStacksInDrone()[i].isEmpty()) {
+						this.setItemStacksInDrone(i, tryPutInInventory(getItemStacksInDrone()[i], itemHandler));
+					}
 				}
-			}
-		}
-
-		for(int i = 0; i < getItemStacksInDrone().length; i++) {
-			if(isItemHandlerFull(itemHandler)) {
-				continue;
-			}
-
-			if(getItemStacksInDrone()[i]!=null&&!getItemStacksInDrone()[i].isEmpty()) {
-				this.setItemStacksInDrone(i, tryPutInInventory(getItemStacksInDrone()[i], itemHandler));
 			}
 		}
 
