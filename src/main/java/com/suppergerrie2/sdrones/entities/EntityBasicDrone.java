@@ -2,6 +2,9 @@ package com.suppergerrie2.sdrones.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
 
 import com.suppergerrie2.sdrones.init.ModSoundEvents;
 import com.suppergerrie2.sdrones.items.ItemDroneStick;
@@ -157,11 +160,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	{
 		super.readEntityFromNBT(compound);
 
-		//		if(compound.hasKey("CarrySize")) {
-		//			carrySize = compound.getInteger("CarrySize");
-		//			this.setItemStacksInDrone(new ItemStack[carrySize]);
-		//		}
-
 		if(compound.hasKey("CarryLevel")) {
 			carryLevel = compound.getInteger("CarryLevel");
 			this.setItemStacksInDrone(new ItemStack[this.getCarrySize()]);
@@ -259,10 +257,10 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		return true;
 	}
 
-	//For some reason this isn't used and every drone reimplements this? Have to look into this.
-	public boolean tryGetItem(Class<? extends Item> itemType, BlockPos pos) {
+	public boolean tryGetItem(Item itemType, BlockPos pos, @Nullable Predicate<Item> itemCheck) {
 
-		if(!this.canPickupItem(ItemStack.EMPTY)) {
+		//TODO: filter intergration.
+		if(!this.canPickupItem()) {
 			return false;
 		}
 
@@ -274,20 +272,26 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 			itemHandler = tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, this.homeFacing);
 			
 			if(itemHandler!=null) {
-				ItemStack pickedUp = this.tryGetFromInventory(itemType, itemHandler);
+				ItemStack pickedUp = this.tryGetFromInventory(itemType, itemHandler, itemCheck);
 
-				for(int i = 0; i < getItemStacksInDrone().length; i++) {
-					if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
+				ItemStack[] stacksInDrone = this.getItemStacksInDrone();
+				for(int i = 0; i < stacksInDrone.length; i++) {
+					if(stacksInDrone[i]==null||stacksInDrone[i].isEmpty()) {
 						this.setItemStacksInDrone(i, pickedUp);
 						return true;
 					}
 				}
+				
+				ItemStack rest = this.tryPutInInventory(pickedUp, itemHandler);
+
+				EntityItem item = new EntityItem(world, this.posX, this.posY, this.posZ, rest);
+				world.spawnEntity(item);
 			}
 		}
 
 		return false;
 	}
-
+	
 	protected ItemStack tryPutInInventory(ItemStack stack, IItemHandler dest) {
 		for(int slot = 0; slot < dest.getSlots() && !stack.isEmpty(); slot++) {
 			stack = dest.insertItem(slot, stack, false);
@@ -295,11 +299,12 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		return stack;
 	}
 
-	private ItemStack tryGetFromInventory(Class<? extends Item> itemType, IItemHandler dest) {
+	private ItemStack tryGetFromInventory(Item itemType, IItemHandler dest, @Nullable Predicate<Item> itemCheck) {
 		ItemStack result = ItemStack.EMPTY;
 		for(int slot = 0; slot < dest.getSlots() && result.isEmpty(); slot++) {
-			if(dest.extractItem(slot, 1, true).getItem().getClass().isInstance(itemType)) {
-				result = dest.extractItem(slot, 1, false);
+			Item i = dest.extractItem(slot, 1, true).getItem();
+			if((itemCheck!=null&&itemCheck.test(i)||i.equals(itemType))) {
+				result = dest.extractItem(slot, dest.getSlotLimit(slot), false);
 			};
 		}
 		return result;
@@ -457,7 +462,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		if(stack==null) stack = ItemStack.EMPTY;
 
 		itemStacksInDrone[slot] = stack;
-		DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
+		if(!this.world.isRemote)DronesPacketHandler.INSTANCE.sendToAll(new ItemsInDroneMessage(getItemStacksInDrone(), this.getEntityId()));
 	}
 
 	public void setItemStacksInDrone(ItemStack[] stacks) {
