@@ -15,15 +15,15 @@ public class EntityAIPlantSapling extends EntityAIBase {
 
 	BlockPos destination;
 
-	public EntityAIPlantSapling (EntityTreeFarmDrone drone, int range) {
+	public EntityAIPlantSapling (EntityTreeFarmDrone drone) {
 		this.drone = drone;
-		this.range = range;
 
 		this.setMutexBits(7);
 	}
 
 	@Override
-	public boolean shouldExecute() {
+	public boolean shouldExecute() {		
+		range = drone.getRange();
 		return drone.hasItems()&&this.searchForDestination();
 	}
 

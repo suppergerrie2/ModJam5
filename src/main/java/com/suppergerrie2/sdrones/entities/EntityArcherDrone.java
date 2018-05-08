@@ -29,18 +29,17 @@ import net.minecraft.world.World;
 public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttackMob {
 	
 	//TODO: Variable weapons?
-	
-	public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
-		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-		this.setRange(16);
+	public EntityArcherDrone(World worldIn) {
+		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
 	}
 
 	public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this(worldIn, x, y, z, spawnedWith, facing, 1);
 	}
 
-	public EntityArcherDrone(World worldIn) {
-		super(worldIn);
+	public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
+		this.setRange(16);
 	}
 
 	@Override

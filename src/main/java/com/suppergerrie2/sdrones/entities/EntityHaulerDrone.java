@@ -12,16 +12,16 @@ import net.minecraft.world.World;
 public class EntityHaulerDrone extends EntityBasicDrone {
 
 	public EntityHaulerDrone(World worldIn) {
-		super(worldIn);
+		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
 		this.setRange(16);
-	}
-
-	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
-		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
 	}
 
 	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this(worldIn, x, y, z, spawnedWith, facing, 1);
+	}
+
+	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
 	}
 	
 	protected void initEntityAI() {

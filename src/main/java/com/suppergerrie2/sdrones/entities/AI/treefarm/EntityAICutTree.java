@@ -15,15 +15,15 @@ public class EntityAICutTree extends EntityAIBase {
 	BlockPos destination;
 	BlockPos woodBlock;
 	
-	public EntityAICutTree (EntityTreeFarmDrone drone, int range) {
+	public EntityAICutTree (EntityTreeFarmDrone drone) {
 		this.drone = drone;
-		this.range = range;
 
 		this.setMutexBits(7);
 	}
 
 	@Override
 	public boolean shouldExecute() {
+		range = drone.getRange();
 		return this.searchForDestination()&&drone.getNavigator().getPathToPos(destination)!=null;
 	}
 

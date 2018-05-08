@@ -16,15 +16,17 @@ public class EntityAIPrepareLand extends EntityAIBase {
 	BlockPos destination;
 	boolean done = false;
 	
-	public EntityAIPrepareLand(EntityCropFarmDrone entityCropFarmDrone, int range) {
+	int waterDist = 9;
+	
+	public EntityAIPrepareLand(EntityCropFarmDrone entityCropFarmDrone) {
 		this.drone = entityCropFarmDrone;
-		this.range = range;
 		this.setMutexBits(7);
 	}
 
 	@Override
 	public boolean shouldExecute() {
 		done = true;
+		range = drone.getRange();
 		return this.searchUnpreparedLand()&&drone.hasDirt();
 	}
 
@@ -63,7 +65,7 @@ public class EntityAIPrepareLand extends EntityAIBase {
 
 		for (int xOffset = -range; xOffset <= range; xOffset++) {
 			for (int zOffset = -range; zOffset <= range; zOffset++) {
-				if(zOffset==0&&xOffset==0) {
+				if(zOffset%waterDist==0&&xOffset%waterDist==0) {
 					continue;
 				}
 				BlockPos pos = homepos.add(xOffset, -1, zOffset);

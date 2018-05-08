@@ -15,14 +15,14 @@ public class EntityAIFarmCrop extends EntityAIBase {
 	
 	BlockPos destination;
 	
-	public EntityAIFarmCrop(EntityCropFarmDrone entityCropFarmDrone, int range) {
+	public EntityAIFarmCrop(EntityCropFarmDrone entityCropFarmDrone) {
 		this.drone = entityCropFarmDrone;
-		this.range = range;
 		this.setMutexBits(7);
 	}
 
 	@Override
 	public boolean shouldExecute() {
+		range = drone.getRange();
 		return this.searchGrownCrop();
 	}
 	

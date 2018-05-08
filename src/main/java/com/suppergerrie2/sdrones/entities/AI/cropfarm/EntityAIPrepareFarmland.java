@@ -18,15 +18,15 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 	boolean prepared = false;
 	EntityAIPrepareLand aiPrepareLand;
 	
-	public EntityAIPrepareFarmland(EntityCropFarmDrone entityCropFarmDrone, int range, EntityAIPrepareLand aiPrepareLand) {
+	public EntityAIPrepareFarmland(EntityCropFarmDrone entityCropFarmDrone, EntityAIPrepareLand aiPrepareLand) {
 		this.drone = entityCropFarmDrone;
-		this.range = range;
 		this.aiPrepareLand = aiPrepareLand;
 		this.setMutexBits(7);
 	}
 
 	@Override
 	public boolean shouldExecute() {
+		range = drone.getRange();
 		return this.searchUnpreparedFarm()&&aiPrepareLand.isDone();
 	}
 

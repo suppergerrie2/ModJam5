@@ -48,26 +48,23 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	ItemStack tool = ItemStack.EMPTY;
 
 	public EntityBasicDrone(World worldIn) {
-		super(worldIn);
-		this.setSize(0.3f, 0.3f);
-		this.enablePersistence();
-		this.setupItemStacksInDrone();
-		this.spawnedWith = ItemStack.EMPTY;
-		homeFacing = EnumFacing.UP;
-		this.setPathPriority(PathNodeType.WATER, -1.0f);
+		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.DOWN);
 	}
 
 	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-		this(worldIn);		
-		this.setPosition(x,y,z);
-		this.setHomePosAndDistance(new BlockPos(x,y,z), 64);
-		this.spawnedWith = spawnedWith;
-		homeFacing = facing;
+		this(worldIn, x, y, z, spawnedWith, facing, 1);		
 	}
 
 	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carryLevel) {
-		this(worldIn, x, y, z, spawnedWith, facing);
+		super(worldIn);
 		this.carryLevel = carryLevel;
+		this.setSize(0.3f, 0.3f);
+		this.enablePersistence();		
+		this.setPathPriority(PathNodeType.WATER, -1.0f);
+		this.setPosition(x,y,z);
+		this.setHomePosAndDistance(new BlockPos(x,y,z), 64);
+		this.spawnedWith = spawnedWith;
+		this.homeFacing = facing;
 		this.setupItemStacksInDrone();
 	}
 
@@ -441,7 +438,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	}
 
 	public float getSpeed() {
-		return 1.0f;
+		return 3.0f;
 	}
 	
 	public ItemStack[] getItemStacksInDrone() {

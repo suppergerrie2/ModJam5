@@ -23,24 +23,25 @@ import net.minecraft.world.World;
 
 public class EntityTreeFarmDrone extends EntityBasicDrone {
 
+	public EntityTreeFarmDrone(World worldIn) {
+		this(worldIn, -1, -1, -1, ItemStack.EMPTY, EnumFacing.UP);
+	}
+
+
+	public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
+		this(worldIn, x, y, z, spawnedWith, facing, 1);
+	}
+
 	public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing,
 			int carrySize) {
 		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
 		this.setRange(16);
 	}
 
-	public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-		this(worldIn, x, y, z, spawnedWith, facing, 1);
-	}
-
-	public EntityTreeFarmDrone(World worldIn) {
-		this(worldIn, -1, -1, -1, ItemStack.EMPTY, EnumFacing.UP);
-	}
-
 	@Override
 	protected void initEntityAI() {
-		this.tasks.addTask(0, new EntityAIPlantSapling(this, 16));
-		this.tasks.addTask(0, new EntityAICutTree(this, 16));
+		this.tasks.addTask(0, new EntityAIPlantSapling(this));
+		this.tasks.addTask(0, new EntityAICutTree(this));
 		this.tasks.addTask(1, new EntityAIGoHome(this));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
 	}
