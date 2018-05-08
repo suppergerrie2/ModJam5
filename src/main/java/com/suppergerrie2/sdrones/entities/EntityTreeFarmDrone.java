@@ -39,9 +39,9 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 	@Override
 	protected void initEntityAI() {
-		this.tasks.addTask(0, new EntityAIPlantSapling(this, 1.0f, 16));
-		this.tasks.addTask(0, new EntityAICutTree(this, 1.0f, 16));
-		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
+		this.tasks.addTask(0, new EntityAIPlantSapling(this, 16));
+		this.tasks.addTask(0, new EntityAICutTree(this, 16));
+		this.tasks.addTask(1, new EntityAIGoHome(this));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
 	}
 

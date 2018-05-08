@@ -1,6 +1,7 @@
 package com.suppergerrie2.sdrones.entities.AI.archer;
 
-import net.minecraft.entity.EntityLiving;
+import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -11,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 public class EntityAIAttackRanged extends EntityAIBase
 {
     /** The entity the AI instance has been applied to */
-    private final EntityLiving entityHost;
+    private final EntityBasicDrone entityHost;
     /** The entity (as a RangedAttackMob) the AI instance has been applied to. */
     private EntityLivingBase attackTarget;
     /**
@@ -19,7 +20,6 @@ public class EntityAIAttackRanged extends EntityAIBase
      * maxRangedAttackTime.
      */
     private int rangedAttackTime;
-    private final double entityMoveSpeed;
     private int seeTime;
     private final int attackIntervalMin;
     /** The maximum time the AI has to wait before peforming another ranged attack. */
@@ -27,23 +27,22 @@ public class EntityAIAttackRanged extends EntityAIBase
     private final float attackRadius;
     private final float maxAttackDistance;
 
-    public EntityAIAttackRanged(IRangedAttackMob attacker, double movespeed, int maxAttackTime, float maxAttackDistanceIn)
+    public EntityAIAttackRanged(IRangedAttackMob attacker, int maxAttackTime, float maxAttackDistanceIn)
     {
-        this(attacker, movespeed, maxAttackTime, maxAttackTime, maxAttackDistanceIn);
+        this(attacker, maxAttackTime, maxAttackTime, maxAttackDistanceIn);
     }
 
-    public EntityAIAttackRanged(IRangedAttackMob attacker, double movespeed, int p_i1650_4_, int maxAttackTime, float maxAttackDistanceIn)
+    public EntityAIAttackRanged(IRangedAttackMob attacker, int p_i1650_4_, int maxAttackTime, float maxAttackDistanceIn)
     {
         this.rangedAttackTime = -1;
 
-        if (!(attacker instanceof EntityLivingBase))
+        if (!(attacker instanceof EntityBasicDrone))
         {
-            throw new IllegalArgumentException("ArrowAttackGoal requires Mob implements RangedAttackMob");
+            throw new IllegalArgumentException("EntityAIAttackRanged requires Drone implements RangedAttackMob");
         }
         else
         {
-            this.entityHost = (EntityLiving)attacker;
-            this.entityMoveSpeed = movespeed;
+            this.entityHost = (EntityBasicDrone)attacker;
             this.attackIntervalMin = p_i1650_4_;
             this.maxRangedAttackTime = maxAttackTime;
             this.attackRadius = maxAttackDistanceIn;
@@ -116,7 +115,7 @@ public class EntityAIAttackRanged extends EntityAIBase
         }
         else
         {
-            this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityMoveSpeed);
+            this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityHost.getSpeed());
         }
 
         this.entityHost.getLookHelper().setLookPositionWithEntity(this.attackTarget, 30.0F, 30.0F);

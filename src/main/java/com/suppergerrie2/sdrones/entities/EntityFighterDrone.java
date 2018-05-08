@@ -41,7 +41,7 @@ public class EntityFighterDrone extends EntityBasicDrone {
 	@Override
 	protected void initEntityAI() {
 		this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
-		this.tasks.addTask(1, new EntityAIGoHome(this, 1.0f));
+		this.tasks.addTask(1, new EntityAIGoHome(this));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
 		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, true, new Predicate<EntityLiving>()
         {

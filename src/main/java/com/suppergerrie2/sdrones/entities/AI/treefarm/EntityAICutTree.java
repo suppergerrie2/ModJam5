@@ -9,16 +9,14 @@ import net.minecraft.util.math.BlockPos;
 public class EntityAICutTree extends EntityAIBase {
 
 	private final EntityTreeFarmDrone drone;
-	private double speed;
 	int range;
 	int treeDist = 5;
 
 	BlockPos destination;
 	BlockPos woodBlock;
 	
-	public EntityAICutTree (EntityTreeFarmDrone drone, double speed, int range) {
+	public EntityAICutTree (EntityTreeFarmDrone drone, int range) {
 		this.drone = drone;
-		this.speed = speed;
 		this.range = range;
 
 		this.setMutexBits(7);
@@ -36,12 +34,12 @@ public class EntityAICutTree extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 	}
 
 	public void updateTask() {
 		if(drone.getDistanceSq(destination)>6) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 		} else {
 			drone.cutTree(destination);
 		}

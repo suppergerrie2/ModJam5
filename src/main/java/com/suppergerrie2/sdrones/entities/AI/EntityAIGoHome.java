@@ -8,11 +8,9 @@ import net.minecraft.util.math.BlockPos;
 public class EntityAIGoHome extends EntityAIBase {
 
 	private final EntityBasicDrone drone;
-	private double speed;
 	
-	public EntityAIGoHome (EntityBasicDrone drone, double speed) {
+	public EntityAIGoHome (EntityBasicDrone drone) {
 		this.drone = drone;
-		this.speed = speed;
 		this.setMutexBits(7);
 	}
 	
@@ -29,13 +27,13 @@ public class EntityAIGoHome extends EntityAIBase {
 	@Override
 	public void startExecuting() {
 		BlockPos home = this.drone.getHomePosition();
-		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), speed);
+		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed());
 	}
 	
 	@Override
 	public void updateTask() {
 		BlockPos home = this.drone.getHomePosition();
-		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), speed);
+		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed());
 	}
 
 }

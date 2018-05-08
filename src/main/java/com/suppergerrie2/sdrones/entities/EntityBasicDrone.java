@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
@@ -53,6 +54,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		this.setupItemStacksInDrone();
 		this.spawnedWith = ItemStack.EMPTY;
 		homeFacing = EnumFacing.UP;
+		this.setPathPriority(PathNodeType.WATER, -1.0f);
 	}
 
 	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
@@ -83,6 +85,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 			this.setItemStacksInDrone(itemsInDrone);
 		}
 	}
+	
 
 	@Override
 	protected void applyEntityAttributes()
@@ -200,11 +203,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		this.setGlowing(selected);
 		
 		this.pushOutOfBlocks(this.posX, (this.getEntityBoundingBox().minY + this.getEntityBoundingBox().maxY) / 2.0D, this.posZ);
-		
-		if(this.selected) {
-			//			BlockPos home = this.getHomePosition();
-			//			Minecraft.getMinecraft().effectRenderer.addEffect(new HomeParticle(world, home.getX()+0.5, home.getY(), home.getZ()+0.5, 1, 1, 1));
-		}
 	}
 	
 	public boolean attackEntityFrom(DamageSource source, float amount)
@@ -215,7 +213,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		return super.attackEntityFrom(source, amount);
     }
 
-	public boolean pickupItem(EntityItem item) {
+	public boolean pickupEntityItem(EntityItem item) {
 		if(!item.cannotPickup()&&canPickupItem(item.getItem())) {
 			for(int i = 0; i < getItemStacksInDrone().length; i++) {
 				if(getItemStacksInDrone()[i]==null||getItemStacksInDrone()[i].isEmpty()) {
@@ -229,7 +227,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		return false;
 	}
 
-	public boolean insertItems(BlockPos pos) {		
+	public boolean insertItemsInBlock(BlockPos pos) {		
 		if(world.isAirBlock(pos)) {
 			pos = pos.offset(homeFacing.getOpposite());
 		}
@@ -434,14 +432,18 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		this.homeFacing = facing;
 	}
 
-	public void setRange(int range) {
-		this.range = range;
-	}
-
 	public int getRange() {
 		return this.range;
 	}
 
+	public void setRange(int range) {
+		this.range = range;
+	}
+
+	public float getSpeed() {
+		return 1.0f;
+	}
+	
 	public ItemStack[] getItemStacksInDrone() {
 		return itemStacksInDrone;
 	}

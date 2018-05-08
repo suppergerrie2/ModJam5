@@ -10,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 public class EntityAIPrepareFarmland extends EntityAIBase {
 
 	private final EntityCropFarmDrone drone;
-	private double speed;
 	int range;
 	int waterDist = 9;
 
@@ -19,9 +18,8 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 	boolean prepared = false;
 	EntityAIPrepareLand aiPrepareLand;
 	
-	public EntityAIPrepareFarmland(EntityCropFarmDrone entityCropFarmDrone, float speed, int range, EntityAIPrepareLand aiPrepareLand) {
+	public EntityAIPrepareFarmland(EntityCropFarmDrone entityCropFarmDrone, int range, EntityAIPrepareLand aiPrepareLand) {
 		this.drone = entityCropFarmDrone;
-		this.speed = speed;
 		this.range = range;
 		this.aiPrepareLand = aiPrepareLand;
 		this.setMutexBits(7);
@@ -44,7 +42,7 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 	}
 
 	public void updateTask() {
@@ -54,7 +52,7 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
         }
 		
 		if(drone.getDistanceSq(destination.add(0, 1, 0))>1.5*1.5) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 		} else {
 			if(water) {
 				drone.world.destroyBlock(destination, true);

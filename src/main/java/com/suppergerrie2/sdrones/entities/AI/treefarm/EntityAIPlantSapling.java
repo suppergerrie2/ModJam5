@@ -10,15 +10,13 @@ import net.minecraft.util.math.BlockPos;
 public class EntityAIPlantSapling extends EntityAIBase {
 
 	private final EntityTreeFarmDrone drone;
-	private double speed;
 	int range;
 	int treeDist = 5;
 
 	BlockPos destination;
 
-	public EntityAIPlantSapling (EntityTreeFarmDrone drone, double speed, int range) {
+	public EntityAIPlantSapling (EntityTreeFarmDrone drone, int range) {
 		this.drone = drone;
-		this.speed = speed;
 		this.range = range;
 
 		this.setMutexBits(7);
@@ -36,12 +34,12 @@ public class EntityAIPlantSapling extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 	}
 
 	public void updateTask() {
 		if(drone.getDistanceSq(destination)>2) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 		} else {
 			drone.placeSapling(destination);
 		}

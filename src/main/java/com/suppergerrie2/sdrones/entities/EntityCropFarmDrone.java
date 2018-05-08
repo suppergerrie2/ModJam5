@@ -43,13 +43,13 @@ public class EntityCropFarmDrone extends EntityBasicDrone {
 	protected void initEntityAI() {
 		//13
 		int range = 4;
-		EntityAIPrepareLand aiPrepareLand = new EntityAIPrepareLand(this, 1.0f, range);
+		EntityAIPrepareLand aiPrepareLand = new EntityAIPrepareLand(this, range);
 		this.tasks.addTask(0, aiPrepareLand);
-		aiPrepareFarmLand =  new EntityAIPrepareFarmland(this, 1.0f, range, aiPrepareLand);
+		aiPrepareFarmLand =  new EntityAIPrepareFarmland(this, range, aiPrepareLand);
 		this.tasks.addTask(1, aiPrepareFarmLand);
-		this.tasks.addTask(2, new EntityAIPlantCrop(this, 1.0f, range));
-		this.tasks.addTask(3, new EntityAIFarmCrop(this, 1.0f, range));
-		this.tasks.addTask(4, new EntityAIGoHome(this, 1.0f));
+		this.tasks.addTask(2, new EntityAIPlantCrop(this, range));
+		this.tasks.addTask(3, new EntityAIFarmCrop(this, range));
+		this.tasks.addTask(4, new EntityAIGoHome(this));
 		this.tasks.addTask(5, new EntityAIWanderAvoidWater(this, 1.0f));
 	}
 
@@ -64,7 +64,7 @@ public class EntityCropFarmDrone extends EntityBasicDrone {
 			if(aiPrepareFarmLand.isPrepared()) {
 				if(this.hasDirt()) {
 					if(this.getDistanceSq(this.getHomePosition())<4) {
-						this.insertItems(getHomePosition());
+						this.insertItemsInBlock(getHomePosition());
 					}
 				} else if(!this.hasSeeds()&&this.getDistanceSq(this.getHomePosition())<4) {
 					this.tryGetItem(null, this.getHomePosition(), new Predicate<Item>()

@@ -10,15 +10,13 @@ import net.minecraft.util.math.BlockPos;
 public class EntityAIFarmCrop extends EntityAIBase {
 
 	private final EntityCropFarmDrone drone;
-	private double speed;
 	int range;
 	int waterDist = 9;
 	
 	BlockPos destination;
 	
-	public EntityAIFarmCrop(EntityCropFarmDrone entityCropFarmDrone, float speed, int range) {
+	public EntityAIFarmCrop(EntityCropFarmDrone entityCropFarmDrone, int range) {
 		this.drone = entityCropFarmDrone;
-		this.speed = speed;
 		this.range = range;
 		this.setMutexBits(7);
 	}
@@ -35,7 +33,7 @@ public class EntityAIFarmCrop extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 	}
 
 	public void updateTask() {
@@ -45,7 +43,7 @@ public class EntityAIFarmCrop extends EntityAIBase {
         }
 		
 		if(drone.getDistanceSq(destination)>2) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), speed);
+			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
 		} else {
 			drone.world.destroyBlock(destination, true);
 		}

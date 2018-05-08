@@ -18,15 +18,13 @@ public class EntityAISearchItems extends EntityAIBase {
 	private final EntityBasicDrone drone;
 	private EntityAINearestAttackableTarget.Sorter sorter;
 	private EntityItem target;
-	private double speed;
 
 	static Map<EntityItem, Integer> claimedItems = new HashMap<EntityItem, Integer>(); 
 
 	private int waitTime;
 
-	public EntityAISearchItems (EntityBasicDrone drone, double speed) {
+	public EntityAISearchItems (EntityBasicDrone drone) {
 		this.drone = drone;
-		this.speed = speed;
 
 		this.sorter = new EntityAINearestAttackableTarget.Sorter(drone);
 		this.setMutexBits(7);
@@ -76,13 +74,13 @@ public class EntityAISearchItems extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		this.drone.getNavigator().tryMoveToEntityLiving(target, this.speed);
+		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed());
 		waitTime = 5*20;
 	}
 
 	@Override
 	public void updateTask() {
-		this.drone.getNavigator().tryMoveToEntityLiving(target, this.speed);
+		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed());
 		waitTime--;
 
 		if(waitTime<=0) {
@@ -92,7 +90,7 @@ public class EntityAISearchItems extends EntityAIBase {
 		}
 
 		if(this.drone.getDistanceSq(target)<1&&!target.cannotPickup()) {
-			this.drone.pickupItem(target);
+			this.drone.pickupEntityItem(target);
 			claimedItems.remove(target);
 			target = null;
 		}
