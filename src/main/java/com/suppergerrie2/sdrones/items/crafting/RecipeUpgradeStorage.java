@@ -57,7 +57,7 @@ public class RecipeUpgradeStorage extends net.minecraftforge.registries.IForgeRe
 			upgrade = in.getTagCompound().getInteger("storageupgrade");
 		}
 		
-		NBTTagCompound nbttagcompound = new NBTTagCompound();
+		NBTTagCompound nbttagcompound = in.hasTagCompound()?in.getTagCompound():new NBTTagCompound();
 		nbttagcompound.setInteger("storageupgrade", upgrade+1);
 		in.setTagCompound(nbttagcompound);
 		return in;
