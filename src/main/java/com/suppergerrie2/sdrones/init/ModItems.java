@@ -1,12 +1,13 @@
 package com.suppergerrie2.sdrones.init;
 
 import com.suppergerrie2.sdrones.Reference;
-import com.suppergerrie2.sdrones.items.ItemArcherDrone;
-import com.suppergerrie2.sdrones.items.ItemCropFarmDrone;
+import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
+import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
+import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
+import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
+import com.suppergerrie2.sdrones.entities.EntityTreeFarmDrone;
 import com.suppergerrie2.sdrones.items.ItemDroneStick;
-import com.suppergerrie2.sdrones.items.ItemFighterDrone;
-import com.suppergerrie2.sdrones.items.ItemHaulerDrone;
-import com.suppergerrie2.sdrones.items.ItemTreeFarmDrone;
+import com.suppergerrie2.sdrones.items.ItemSpawnDrone;
 import com.suppergerrie2.sdrones.items.crafting.RecipeFilterDrone;
 import com.suppergerrie2.sdrones.items.crafting.RecipeUpgradeStorage;
 
@@ -47,11 +48,11 @@ public class ModItems {
 	}.setBackgroundImageName("item_search.png");
 	
 	public static void init() {
-		itemHaulerDrone = new ItemHaulerDrone("item_hauler_drone");
-		itemFighterDrone = new ItemFighterDrone("item_fighter_drone");
-		itemTreeFarmDrone = new ItemTreeFarmDrone("item_tree_farm_drone");
-		itemCropFarmDrone = new ItemCropFarmDrone("item_crop_farm_drone");
-		itemArcherDrone = new ItemArcherDrone("item_archer_drone");
+		itemHaulerDrone = new ItemSpawnDrone<EntityHaulerDrone>("item_hauler_drone", EntityHaulerDrone::new);
+		itemFighterDrone = new ItemSpawnDrone<EntityFighterDrone>("item_fighter_drone", EntityFighterDrone::new);
+		itemTreeFarmDrone = new ItemSpawnDrone<EntityTreeFarmDrone>("item_tree_farm_drone", EntityTreeFarmDrone::new);
+		itemCropFarmDrone = new ItemSpawnDrone<EntityCropFarmDrone>("item_crop_farm_drone", EntityCropFarmDrone::new);
+		itemArcherDrone = new ItemSpawnDrone<EntityArcherDrone>("item_archer_drone", EntityArcherDrone::new);
 		
 		droneStick = new ItemDroneStick("drone_stick");
 	}
