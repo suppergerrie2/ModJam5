@@ -267,7 +267,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 	public boolean tryGetItem(Item itemType, BlockPos pos, @Nullable Predicate<Item> itemCheck) {
 
-		//TODO: filter intergration.
 		if(!this.canPickupItem()) {
 			return false;
 		}
@@ -310,8 +309,10 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	private ItemStack tryGetFromInventory(Item itemType, IItemHandler dest, @Nullable Predicate<Item> itemCheck) {
 		ItemStack result = ItemStack.EMPTY;
 		for(int slot = 0; slot < dest.getSlots() && result.isEmpty(); slot++) {
-			Item i = dest.extractItem(slot, 1, true).getItem();
-			if((itemCheck!=null&&itemCheck.test(i)||i.equals(itemType))) {
+			ItemStack stack = dest.extractItem(slot, 1, true);
+			Item i = stack.getItem();
+			
+			if(((itemCheck!=null&&itemCheck.test(i))||i.equals(itemType))&&this.canPickupItem(stack)) {
 				result = dest.extractItem(slot, dest.getSlotLimit(slot), false);
 			};
 		}
