@@ -39,19 +39,19 @@ public class EntityAISearchItems extends EntityAIBase {
 		double range = drone.getRange();
 		List<EntityItem> itemsInRange = this.drone.world.<EntityItem>getEntitiesWithinAABB(EntityItem.class, this.drone.getEntityBoundingBox().grow(range, 4.0D,  range));
 		Collections.sort(itemsInRange, this.sorter);
-
+		
 		if(itemsInRange.isEmpty()) {
 			return false;
 		} else {
 			for(EntityItem item : itemsInRange) {
 				int itemsLeft = item.getItem().getCount();
-
+				
 				if(claimedItems.containsKey(item)) {
 					itemsLeft-=claimedItems.get(item);
 				}
 
 				if(itemsLeft>0&&drone.canPickupItem(item.getItem())) {
-					if(drone.getNavigator().getPathToEntityLiving(item)!=null) {
+					if(this.drone.getDistanceSq(item)<1||drone.getNavigator().getPathToEntityLiving(item)!=null) {
 
 						target = item;
 						claimedItems.put(item, drone.getCarrySize());
