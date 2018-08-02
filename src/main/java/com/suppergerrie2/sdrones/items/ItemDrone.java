@@ -1,15 +1,26 @@
 package com.suppergerrie2.sdrones.items;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.annotation.Nullable;
+
+import com.suppergerrie2.sdrones.DroneMod;
+import com.suppergerrie2.sdrones.upgrades.DroneUpgrade;
+
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public abstract class ItemDrone extends ItemBasic {
+
+	static Map<ResourceLocation, ItemDrone> entityNameToItem = new HashMap<ResourceLocation, ItemDrone>();
 
 	public ItemDrone(String name) {
 		super(name);
@@ -34,12 +45,18 @@ public abstract class ItemDrone extends ItemBasic {
 					tooltip.add(" -" + filter[i].getDisplayName());
 				}
 			}
-			
-			int upgrade = nbt.getInteger("storageupgrade");
-			tooltip.add("Storage upgrade: " + upgrade);
+
+			//			int upgrade = nbt.getInteger("storageupgrade");
+			//			tooltip.add("Storage upgrade: " + upgrade);
+
+			DroneUpgrade[] upgrades = DroneUpgrade.getUpgradesFromNBT(nbt);
+
+			for(DroneUpgrade upgrade : upgrades) {
+				tooltip.add(I18n.format("upgrade_tooltip", upgrade.getDisplayName(), upgrade.getLevelFromNBT(nbt)));
+			}
 		}
 	}
-	
+
 	public boolean hasFilter(ItemStack stack) {
 		NBTTagCompound nbt = stack.getTagCompound();
 		if(nbt!=null) {
@@ -55,7 +72,7 @@ public abstract class ItemDrone extends ItemBasic {
 		}
 		return false;
 	}
-	
+
 	public List<ItemStack> getFilter(ItemStack stack) {
 		NBTTagCompound nbt = stack.getTagCompound();
 		if(nbt!=null) {
@@ -69,12 +86,42 @@ public abstract class ItemDrone extends ItemBasic {
 		}
 		return new ArrayList<ItemStack>();
 	}
-	
+
+	/**
+	 * @Deprecated use {@link #getUpgradeLevel(ItemStack, ResourceLocation) getUpgradeLevel}
+	 */
+	/*@Deprecated
 	public int getStorageUpgrade(ItemStack stack) {
 		NBTTagCompound nbt = stack.getTagCompound();
 		if(nbt!=null) {
 			return nbt.getInteger("storageupgrade");
 		}
 		return 0;
+	}*/
+
+	public int getUpgradeLevel(ItemStack stack, ResourceLocation upgradeType) {
+		if(stack.hasTagCompound()) {
+			NBTTagCompound compound = stack.getTagCompound();
+
+			DroneUpgrade upgrade = DroneUpgrade.getByName(upgradeType);
+
+			if(upgrade==null) {
+				DroneMod.logger.warn("Trying to get level for unknown upgradeType %s!", upgradeType);
+				return 0;
+			}
+
+			return upgrade.getLevelFromNBT(compound);
+		}
+
+		return 0;
+	}
+
+	@Nullable
+	public static ItemDrone getSpawnItemForEntity(ResourceLocation rl) {
+		return entityNameToItem.get(rl);
+	}
+
+	public static List<ItemDrone> getAllSpawnItems() {
+		return new ArrayList<ItemDrone>(entityNameToItem.values());
 	}
 }

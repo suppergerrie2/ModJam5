@@ -2,23 +2,30 @@ package com.suppergerrie2.sdrones.items;
 
 import java.util.function.Function;
 
+import com.suppergerrie2.sdrones.DroneMod;
 import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
+import com.suppergerrie2.sdrones.upgrades.DroneUpgrade;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ItemSpawnDrone<E extends EntityBasicDrone> extends ItemDrone {
 
 	Function<World, E> droneCreator;
-
-	public ItemSpawnDrone(String name, Function<World, E> droneCreator) {
+	
+	public ItemSpawnDrone(String name, ResourceLocation droneLocation, Function<World, E> droneCreator) {
 		super(name);
+		if(entityNameToItem.containsKey(droneLocation)) {
+			DroneMod.logger.warn("Already have spawn item for " + droneLocation.toString());
+		}
 		
+		entityNameToItem.put(droneLocation, this);
 		this.droneCreator = droneCreator;
 	}
 	
@@ -38,7 +45,9 @@ public class ItemSpawnDrone<E extends EntityBasicDrone> extends ItemDrone {
 			ItemStack stack = itemstack.copy();
 			stack.setCount(1);
 			EntityBasicDrone entityDrone = droneCreator.apply(worldIn);
-			entityDrone.init(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing, this.getStorageUpgrade(itemstack)+1);
+			entityDrone.init(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ, stack, facing);
+			
+			DroneUpgrade.applyUpgradesFromStack(itemstack, entityDrone);
 			
 			if(this.hasFilter(stack)) {
 				entityDrone.setFilter(this.getFilter(itemstack));
@@ -50,5 +59,4 @@ public class ItemSpawnDrone<E extends EntityBasicDrone> extends ItemDrone {
 		return EnumActionResult.SUCCESS;
 	}
 
-	
 }

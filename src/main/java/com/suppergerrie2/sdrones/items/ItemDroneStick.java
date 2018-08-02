@@ -51,6 +51,8 @@ public class ItemDroneStick extends ItemBasic {
 			this.clearSelected();
 		}
 
+		System.out.println(Integer.MAX_VALUE);
+		
 		return super.onItemRightClick(worldIn, playerIn, handIn);
 	}
 

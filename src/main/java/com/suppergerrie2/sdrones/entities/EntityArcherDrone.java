@@ -21,7 +21,6 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -30,17 +29,19 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
 	
 	//TODO: Variable weapons?
 	public EntityArcherDrone(World worldIn) {
-		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
+//		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
+		super(worldIn);
+		this.setRange(16);
 	}
 
-	public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
+	/*public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this(worldIn, x, y, z, spawnedWith, facing, 1);
 	}
 
+	@Deprecated
 	public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
 		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-		this.setRange(16);
-	}
+	}*/
 
 	@Override
 	protected void initEntityAI() {

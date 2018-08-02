@@ -18,24 +18,25 @@ import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class EntityFighterDrone extends EntityBasicDrone {
 	
 	//TODO: Variable weapons?
 	public EntityFighterDrone(World worldIn) {
-		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
+//		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
+		super(worldIn);
 	}
 
-	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-		this(worldIn, x, y, z, spawnedWith, facing, 1);
-	}
-
-	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
-		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-		this.setRange(16);
-	}
+//	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
+//		this(worldIn, x, y, z, spawnedWith, facing, 1);
+//	}
+//
+//	@Deprecated
+//	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+//		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
+//		this.setRange(16);
+//	}
 
 	@Override
 	protected void initEntityAI() {

@@ -10,6 +10,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
+@Deprecated
 public class RecipeUpgradeStorage extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
 
 	ItemStack in = ItemStack.EMPTY;

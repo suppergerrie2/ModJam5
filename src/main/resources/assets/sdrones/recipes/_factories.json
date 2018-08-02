@@ -1,0 +1,8 @@
+{
+	"ingredients": {
+		"drone": "com.suppergerrie2.sdrones.items.crafting.ingredient.IngredientDrone$Factory"
+	},
+	"recipes": {
+		"drone_upgrade_shaped": "com.suppergerrie2.sdrones.items.crafting.ShapedDroneUpgradeRecipe$Factory"
+	}
+}

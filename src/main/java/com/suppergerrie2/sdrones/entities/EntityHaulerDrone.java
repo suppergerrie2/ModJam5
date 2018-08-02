@@ -5,24 +5,24 @@ import com.suppergerrie2.sdrones.entities.AI.hauler.EntityAIBringItemHome;
 import com.suppergerrie2.sdrones.entities.AI.hauler.EntityAISearchItems;
 
 import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class EntityHaulerDrone extends EntityBasicDrone {
 
 	public EntityHaulerDrone(World worldIn) {
-		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
+//		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
+		super(worldIn);
 		this.setRange(16);
 	}
 
-	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-		this(worldIn, x, y, z, spawnedWith, facing, 1);
-	}
-
-	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
-		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-	}
+//	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
+//		this(worldIn, x, y, z, spawnedWith, facing, 1);
+//	}
+//
+//	@Deprecated
+//	public EntityHaulerDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+//		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
+//	}
 	
 	protected void initEntityAI() {
 		this.tasks.addTask(0, new EntityAISearchItems(this));

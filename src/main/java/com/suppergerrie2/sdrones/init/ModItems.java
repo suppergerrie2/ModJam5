@@ -1,15 +1,13 @@
 package com.suppergerrie2.sdrones.init;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.suppergerrie2.sdrones.Reference;
-import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
-import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
-import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
-import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
-import com.suppergerrie2.sdrones.entities.EntityTreeFarmDrone;
+import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
 import com.suppergerrie2.sdrones.items.ItemDroneStick;
 import com.suppergerrie2.sdrones.items.ItemSpawnDrone;
 import com.suppergerrie2.sdrones.items.crafting.RecipeFilterDrone;
-import com.suppergerrie2.sdrones.items.crafting.RecipeUpgradeStorage;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -21,17 +19,15 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 
 @Mod.EventBusSubscriber(modid=Reference.MODID)
 public class ModItems {
 
+	@ObjectHolder(value = "sdrones:item_hauler_drone")
 	public static Item itemHaulerDrone;
-	public static Item itemFighterDrone;
-	public static Item itemTreeFarmDrone;
-	public static Item itemCropFarmDrone;
-	public static Item itemArcherDrone;
 	
-	public static Item droneStick;
+	static Set<Item> itemsToRegister = new HashSet<Item>();
 	
 	public static final CreativeTabs tabDronesMod = new CreativeTabs("tabDronesMod") {
 
@@ -48,43 +44,37 @@ public class ModItems {
 	}.setBackgroundImageName("item_search.png");
 	
 	public static void init() {
-		itemHaulerDrone = new ItemSpawnDrone<EntityHaulerDrone>("item_hauler_drone", EntityHaulerDrone::new);
-		itemFighterDrone = new ItemSpawnDrone<EntityFighterDrone>("item_fighter_drone", EntityFighterDrone::new);
-		itemTreeFarmDrone = new ItemSpawnDrone<EntityTreeFarmDrone>("item_tree_farm_drone", EntityTreeFarmDrone::new);
-		itemCropFarmDrone = new ItemSpawnDrone<EntityCropFarmDrone>("item_crop_farm_drone", EntityCropFarmDrone::new);
-		itemArcherDrone = new ItemSpawnDrone<EntityArcherDrone>("item_archer_drone", EntityArcherDrone::new);
-		
-		droneStick = new ItemDroneStick("drone_stick");
+		itemsToRegister.add(new ItemDroneStick("drone_stick"));
 	}
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		init();
-		
-		event.getRegistry().registerAll(itemHaulerDrone, itemFighterDrone, droneStick, itemTreeFarmDrone, itemCropFarmDrone, itemArcherDrone);
+
+		event.getRegistry().registerAll(itemsToRegister.toArray(new Item[1]));
 	}
 	
 	@SubscribeEvent
 	public static void registerRenders(ModelRegistryEvent event) {
-		registerRender(itemHaulerDrone);
-		registerRender(itemFighterDrone);
-		registerRender(itemTreeFarmDrone);
-		registerRender(itemCropFarmDrone);
-		registerRender(itemArcherDrone);
-		
-		registerRender(droneStick);
+		for(Item i : itemsToRegister) {
+			registerRender(i);
+		}
 	}
 	
 	@SubscribeEvent
 	public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
 		IRecipe recipeFilter = new RecipeFilterDrone().setRegistryName("filter_recipe");
-		IRecipe recipeStorage = new RecipeUpgradeStorage().setRegistryName("filter_storage_upgrade");
+//		IRecipe recipeStorage = new RecipeUpgradeStorage().setRegistryName("filter_storage_upgrade");
 		
-		event.getRegistry().registerAll(recipeFilter, recipeStorage);
+		event.getRegistry().registerAll(recipeFilter);
 	}
 	
 	private static void registerRender(Item item) {
 		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation( item.getRegistryName(), "inventory"));
+	}
+
+	public static <T extends EntityBasicDrone> void registerItem(ItemSpawnDrone<T> itemSpawnDrone) {
+		itemsToRegister.add(itemSpawnDrone);
 	}
 	
 }

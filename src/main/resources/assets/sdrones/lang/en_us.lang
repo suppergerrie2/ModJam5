@@ -21,4 +21,7 @@ dronestick.message.deselect=Shift+Right click in air to deselect drones.
 dronestick.message.kill=Shift+Right on drone to kill drone.
 dronestick.message.sethome=Right click on block to set home.
 
+upgrade_tooltip=%1$s, level: %2$s
+sdrones_storage=Storage Upgrade
+
 itemGroup.tabDronesMod=Drones

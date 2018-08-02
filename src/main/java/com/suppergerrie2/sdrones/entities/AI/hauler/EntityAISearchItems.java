@@ -21,7 +21,7 @@ public class EntityAISearchItems extends EntityAIBase {
 
 	static Map<EntityItem, Integer> claimedItems = new HashMap<EntityItem, Integer>(); 
 
-	private int waitTime;
+//	private int waitTime;
 
 	public EntityAISearchItems (EntityBasicDrone drone) {
 		this.drone = drone;
@@ -69,30 +69,45 @@ public class EntityAISearchItems extends EntityAIBase {
 		if(target!=null&&target.isDead&&claimedItems.containsKey(target)) {
 			claimedItems.remove(target);
 		}
-		return (target!=null&&!target.isDead&&this.drone.canPickupItem(target.getItem()));
+		
+		boolean c = (target!=null&&!target.isDead&&this.drone.canPickupItem(target.getItem()));
+		
+		if(!c) {
+			claimedItems.remove(target);
+		}
+		
+		return c;
 	}
 
 	@Override
 	public void startExecuting() {
 		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed());
-		waitTime = 5*20;
+		//waitTime = 5*20;
 	}
 
 	@Override
 	public void updateTask() {
 		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed());
-		waitTime--;
-
-		if(waitTime<=0) {
-			claimedItems.remove(target);
-			target=null;
-			return;
-		}
+//		waitTime--;
+//
+//		if(waitTime<=0) {
+//			claimedItems.remove(target);
+//			target=null;
+//			return;
+//		}
 
 		if(this.drone.getDistanceSq(target)<1&&!target.cannotPickup()) {
 			this.drone.pickupEntityItem(target);
-			claimedItems.remove(target);
-			target = null;
+
+			if(claimedItems.containsKey(target)&&claimedItems.get(target)!=null) {
+				int count = claimedItems.get(target);
+				claimedItems.put(target, --count);
+				
+				if(claimedItems.get(target)<=0) {
+					claimedItems.remove(target);
+					target = null;
+				}
+			}
 		}
 	}
 

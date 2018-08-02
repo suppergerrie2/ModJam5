@@ -181,6 +181,4 @@ public class RecipeFilterDrone extends net.minecraftforge.registries.IForgeRegis
 		return in;
 	}
 
-
-
 }
