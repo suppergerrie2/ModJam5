@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -21,9 +20,55 @@ import net.minecraftforge.client.ForgeHooksClient;
  * HaulerDrone - suppergerrie2
  * Created using Tabula 7.0.0
  */
-public class ModelDrone extends ModelBase {
+public class ModelBasicDrone extends ModelDrone {
+	//Fallback if I don't have a custom model
+	
+	public ModelRenderer body;
+	public ModelRenderer trackL;
+	public ModelRenderer trackR;
+	public ModelRenderer antennatorch;
+	public ModelRenderer light;
+
+	public ModelBasicDrone() {
+		this.textureWidth = 64;
+		this.textureHeight = 64;
+		this.trackL = new ModelRenderer(this, 0, 22);
+		this.trackL.setRotationPoint(7.0F, 6.0F, 0.0F);
+		this.trackL.addBox(-2.0F, -2.0F, -8.0F, 4, 4, 16, 0.0F);
+		this.light = new ModelRenderer(this, 42, 0);
+		this.light.setRotationPoint(0.0F, -5.0F, 0.0F);
+		this.light.addBox(-2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F);
+		this.body = new ModelRenderer(this, 0, 0);
+		this.body.setRotationPoint(0.0F, 21.6F, 0.0F);
+		this.body.addBox(-7.0F, -4.0F, -7.0F, 14, 8, 14, 0.0F);
+		this.trackR = new ModelRenderer(this, 0, 42);
+		this.trackR.setRotationPoint(-7.0F, 6.0F, 0.0F);
+		this.trackR.addBox(-2.0F, -2.0F, -8.0F, 4, 4, 16, 0.0F);
+		this.antennatorch = new ModelRenderer(this, 0, 0);
+		this.antennatorch.setRotationPoint(0.0F, -6.9F, 0.0F);
+		this.antennatorch.addBox(-1.0F, -3.0F, -1.0F, 2, 6, 2, 0.0F);
+		this.body.addChild(this.trackL);
+		this.antennatorch.addChild(this.light);
+		this.body.addChild(this.trackR);
+		this.body.addChild(this.antennatorch);
+	}
+
 	float itemOffset = 0.5f;
 
+	@Override
+	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) { 
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(this.body.offsetX, this.body.offsetY, this.body.offsetZ);
+		GlStateManager.translate(this.body.rotationPointX * f5, this.body.rotationPointY * f5, this.body.rotationPointZ * f5);
+		GlStateManager.scale(0.3D, 0.3D, 0.3D);
+		GlStateManager.translate(-this.body.offsetX, -this.body.offsetY, -this.body.offsetZ);
+		GlStateManager.translate(-this.body.rotationPointX * f5, -this.body.rotationPointY * f5, -this.body.rotationPointZ * f5);
+		this.body.render(f5);
+		GlStateManager.popMatrix();
+
+		this.renderInventory(entity);
+	}
+	
 	public void renderInventory(Entity entity) {
 		GlStateManager.pushMatrix();
 

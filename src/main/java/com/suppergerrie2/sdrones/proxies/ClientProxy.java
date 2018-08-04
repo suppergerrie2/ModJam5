@@ -1,14 +1,18 @@
 package com.suppergerrie2.sdrones.proxies;
 
-import com.suppergerrie2.sdrones.entities.EntityDroneArrow;
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
 import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
+import com.suppergerrie2.sdrones.entities.EntityDroneArrow;
 import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
 import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
 import com.suppergerrie2.sdrones.entities.EntityTreeFarmDrone;
-import com.suppergerrie2.sdrones.entities.rendering.RenderArcherDrone;
 import com.suppergerrie2.sdrones.entities.rendering.RenderCustomArrow;
 import com.suppergerrie2.sdrones.entities.rendering.RenderDrone;
+import com.suppergerrie2.sdrones.entities.rendering.models.ModelArcherDrone;
+import com.suppergerrie2.sdrones.entities.rendering.models.ModelCropFarmDrone;
+import com.suppergerrie2.sdrones.entities.rendering.models.ModelFighterDrone;
+import com.suppergerrie2.sdrones.entities.rendering.models.ModelHaulerDrone;
+import com.suppergerrie2.sdrones.entities.rendering.models.ModelTreeFarmDrone;
 
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -26,7 +30,7 @@ public class ClientProxy implements IProxy {
 
 			@Override
 			public Render<? super EntityHaulerDrone> createRenderFor(RenderManager manager) {
-				return new RenderDrone(manager, "hauler_drone");
+				return new RenderDrone(manager, new ModelHaulerDrone(), "hauler_drone");
 			}
 		});
 		
@@ -34,7 +38,7 @@ public class ClientProxy implements IProxy {
 
 			@Override
 			public Render<? super EntityFighterDrone> createRenderFor(RenderManager manager) {
-				return new RenderDrone(manager, "fighter_drone");
+				return new RenderDrone(manager, new ModelFighterDrone(), "fighter_drone");
 			}
 		});
 		
@@ -42,7 +46,7 @@ public class ClientProxy implements IProxy {
 
 			@Override
 			public Render<? super EntityTreeFarmDrone> createRenderFor(RenderManager manager) {
-				return new RenderDrone(manager, "tree_farm_drone");
+				return new RenderDrone(manager, new ModelTreeFarmDrone(), "tree_farm_drone");
 			}
 		});
 		
@@ -50,7 +54,7 @@ public class ClientProxy implements IProxy {
 
 			@Override
 			public Render<? super EntityCropFarmDrone> createRenderFor(RenderManager manager) {
-				return new RenderDrone(manager, "crop_farm_drone");
+				return new RenderDrone(manager, new ModelCropFarmDrone(), "crop_farm_drone");
 			}
 		});
 		
@@ -58,7 +62,7 @@ public class ClientProxy implements IProxy {
 
 			@Override
 			public Render<? super EntityArcherDrone> createRenderFor(RenderManager manager) {
-				return new RenderArcherDrone(manager);
+				return new RenderDrone(manager, new ModelArcherDrone(), "archer_drone");
 			}
 		});
 		
