@@ -50,6 +50,7 @@ public class ShapedDroneUpgradeRecipe extends ShapedOreRecipe {
 		for(int i = 0; i < inventory.getSizeInventory(); i++) {
 			if(inventory.getStackInSlot(i).getItem() instanceof ItemDrone) {
 				output = inventory.getStackInSlot(i).copy();
+				output.setCount(1);
 				break;
 			}
 		}

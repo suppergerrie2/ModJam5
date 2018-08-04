@@ -2,18 +2,11 @@ package com.suppergerrie2.sdrones.entities.rendering.models;
 
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.client.ForgeHooksClient;
 
 /**
  * ModelArcherDroneHaze33E - Haze33E

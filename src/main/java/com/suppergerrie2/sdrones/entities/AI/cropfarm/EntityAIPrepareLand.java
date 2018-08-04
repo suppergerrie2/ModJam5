@@ -38,7 +38,7 @@ public class EntityAIPrepareLand extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
+		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
 	}
 
 	public void updateTask() {
@@ -46,7 +46,7 @@ public class EntityAIPrepareLand extends EntityAIBase {
 			this.drone.getJumpHelper().setJumping();
 		}
 		if(drone.getDistanceSq(destination.add(0, 1, 0))>3*3) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
+			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
 		} else {
 			if(destroy) {
 				drone.world.destroyBlock(destination, true);

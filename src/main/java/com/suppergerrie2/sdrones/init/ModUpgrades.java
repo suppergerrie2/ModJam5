@@ -14,22 +14,37 @@ public class ModUpgrades {
 
 	@SubscribeEvent
 	public static void registerTest(RegistryEvent.Register<DroneUpgrade> event) {
-		DroneUpgrade test = new DroneUpgrade(15) {
+		event.getRegistry().registerAll(
+				new DroneUpgrade(15) {
 
-			@Override
-			public EnumActionResult applyUpgrade(EntityBasicDrone drone, int level) {
+					@Override
+					public EnumActionResult applyUpgrade(EntityBasicDrone drone, int level) {
+
+						if(this.canApplyUpgrade(drone)) {
+							drone.setCarrySize(2+(level*2));
+							return EnumActionResult.SUCCESS;
+						}
+
+						return EnumActionResult.FAIL;
+					}
+
+				}.setRegistryName("storage"),
 				
-				if(this.canApplyUpgrade(drone)) {
-					drone.setCarrySize(2+(level*2));
-					return EnumActionResult.SUCCESS;
-				}
-				
-				return EnumActionResult.PASS;
-			}
-			
-		}.setRegistryName("storage");
-		
-		event.getRegistry().register(test);
+				new DroneUpgrade(10) {
+					
+					@Override
+					public EnumActionResult applyUpgrade(EntityBasicDrone drone, int level) {
+						
+						if(this.canApplyUpgrade(drone)) {
+							drone.setSpeed(Math.pow(1.08, level));
+							return EnumActionResult.SUCCESS;
+						}
+						
+						return EnumActionResult.FAIL;
+						
+					}
+					
+				}.setRegistryName("speed"));
 	}
-	
+
 }

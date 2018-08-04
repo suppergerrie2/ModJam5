@@ -81,13 +81,13 @@ public class EntityAISearchItems extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed());
+		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed((float) drone.getDistance(target)));
 		//waitTime = 5*20;
 	}
 
 	@Override
 	public void updateTask() {
-		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed());
+		this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed((float) drone.getDistance(target)));
 //		waitTime--;
 //
 //		if(waitTime<=0) {

@@ -44,27 +44,15 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 	List<ItemStack> filter = new ArrayList<ItemStack>();
 
-	//	@Deprecated
-	//	int carryLevel = 1;
 	EnumFacing homeFacing;
 	boolean selected = false;
 	int range = 16;
+	double speed = 1.0;
 	ItemStack tool = ItemStack.EMPTY;
 
 	public EntityBasicDrone(World worldIn) {
-		//		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.DOWN);
 		super(worldIn);
 	}
-
-	//	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-	//		this(worldIn, x, y, z, spawnedWith, facing, 1);		
-	//	}
-	//
-	//	@Deprecated
-	//	public EntityBasicDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carryLevel) {
-	//		super(worldIn);
-	//		this.init(x, y, z, spawnedWith, facing);
-	//	}
 
 	public void init(double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this.setSize(0.3f, 0.3f);
@@ -91,7 +79,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 			this.setItemStacksInDrone(itemsInDrone);
 		}
 	}
-
 
 	@Override
 	protected void applyEntityAttributes()
@@ -162,7 +149,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		compound.setTag("SpawnedWith", nbttagcompound);
 
 		compound.setInteger("CarrySize", this.getCarrySize());
-		//		compound.setInteger("CarryLevel", carryLevel);
 
 		BlockPos pos = this.getHomePosition();
 		compound.setIntArray("HomePos", new int[] {pos.getX(), pos.getY(), pos.getZ()});
@@ -174,11 +160,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	public void readEntityFromNBT(NBTTagCompound compound)
 	{
 		super.readEntityFromNBT(compound);
-
-		//		if(compound.hasKey("CarryLevel")) {
-		//			carryLevel = compound.getInteger("CarryLevel");
-		//			this.setItemStacksInDrone(new ItemStack[this.getCarrySize()]);
-		//		}
 
 		if(compound.hasKey("CarrySize")) {
 			this.setupItemStacksInDrone(compound.getInteger("CarrySize"));
@@ -478,9 +459,18 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	public void setRange(int range) {
 		this.range = range;
 	}
-
+	
+	@Deprecated
 	public float getSpeed() {
-		return 1.0f;
+		return (float)this.speed;
+	}
+	
+	public float getSpeed(float distanceToTarget) {
+		return (float) (distanceToTarget>5?this.speed:Math.max(this.speed-1/distanceToTarget, 1.0f));
+	}
+
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 
 	public ItemStack[] getItemStacksInDrone() {

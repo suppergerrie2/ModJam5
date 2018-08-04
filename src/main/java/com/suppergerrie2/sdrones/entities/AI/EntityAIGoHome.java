@@ -27,13 +27,13 @@ public class EntityAIGoHome extends EntityAIBase {
 	@Override
 	public void startExecuting() {
 		BlockPos home = this.drone.getHomePosition();
-		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed());
+		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed((float) drone.getDistance(home.getX(), home.getY(), home.getZ())));
 	}
 	
 	@Override
 	public void updateTask() {
 		BlockPos home = this.drone.getHomePosition();
-		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed());
+		this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed((float) drone.getDistance(home.getX(), home.getY(), home.getZ())));
 	}
 
 }

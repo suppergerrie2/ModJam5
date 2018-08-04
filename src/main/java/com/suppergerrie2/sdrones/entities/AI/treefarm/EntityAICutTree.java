@@ -34,12 +34,12 @@ public class EntityAICutTree extends EntityAIBase {
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
+		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
 	}
 
 	public void updateTask() {
 		if(drone.getDistanceSq(destination)>6) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed());
+			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
 		} else {
 			drone.cutTree(destination);
 		}

@@ -115,7 +115,7 @@ public class EntityAIAttackRanged extends EntityAIBase
         }
         else
         {
-            this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityHost.getSpeed());
+            this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityHost.getSpeed((float) d0));
         }
 
         this.entityHost.getLookHelper().setLookPositionWithEntity(this.attackTarget, 30.0F, 30.0F);

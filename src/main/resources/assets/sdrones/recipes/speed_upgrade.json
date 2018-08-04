@@ -1,0 +1,20 @@
+{
+    "type": "sdrones:drone_upgrade_shaped",
+    "upgrade_type": "speed",
+    "pattern": [   
+        " r ",
+        "sds",
+        " s "
+    ],
+    "key": {
+        "d": {
+            "type": "sdrones:drone"
+        },
+        "s": {
+            "item": "minecraft:sugar"
+        },
+        "r": {
+            "item": "minecraft:redstone"
+        }
+    }
+}
