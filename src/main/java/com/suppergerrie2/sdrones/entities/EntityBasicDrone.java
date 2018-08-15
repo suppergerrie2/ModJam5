@@ -52,12 +52,12 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 	public EntityBasicDrone(World worldIn) {
 		super(worldIn);
-	}
-
-	public void init(double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this.setSize(0.3f, 0.3f);
 		this.enablePersistence();
 		this.setPathPriority(PathNodeType.WATER, -1.0f);
+	}
+
+	public void init(double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this.setPosition(x, y, z);
 		this.setHomePosAndDistance(new BlockPos(x, y, z), 64);
 		this.spawnedWith = spawnedWith;
@@ -342,8 +342,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 				this.setDead();
 				this.onDeath(DamageSource.causePlayerDamage(player));
 			} else {
-				ItemDroneStick droneStick = (ItemDroneStick) player.getHeldItem(hand).getItem();
-				droneStick.addSelected(this);
+				ItemDroneStick.addSelected(this, player.getHeldItem(hand));
 				this.selected = true;
 			}
 		}
