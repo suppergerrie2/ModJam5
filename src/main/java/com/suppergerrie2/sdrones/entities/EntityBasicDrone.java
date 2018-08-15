@@ -193,6 +193,10 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 		if (compound.hasKey("Range")) {
 			this.setRange(compound.getInteger("Range"));
+		} else {
+			if (this instanceof EntityCropFarmDrone) {
+				this.setRange(4);
+			}
 		}
 	}
 
