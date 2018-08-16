@@ -17,7 +17,7 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 	boolean water = true;
 	boolean prepared = false;
 	EntityAIPrepareLand aiPrepareLand;
-	
+
 	public EntityAIPrepareFarmland(EntityCropFarmDrone entityCropFarmDrone, EntityAIPrepareLand aiPrepareLand) {
 		this.drone = entityCropFarmDrone;
 		this.aiPrepareLand = aiPrepareLand;
@@ -26,75 +26,79 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 
 	@Override
 	public boolean shouldExecute() {
-		range = drone.getRange();
-		return this.searchUnpreparedFarm()&&aiPrepareLand.isDone();
+		this.range = this.drone.getRange();
+		return this.searchUnpreparedFarm() && this.aiPrepareLand.isDone();
 	}
 
 	boolean searchUnpreparedFarm() {
-		prepared = true;
+		this.prepared = true;
 		return (this.searchUnpreparedWater() || this.searchUnpreparedFarmland());
 	}
 
 	@Override
 	public boolean shouldContinueExecuting() {
-		return (drone.getDistanceSq(destination)>2&&!(isBlockPrepared(destination)));
+		return (this.drone.getDistanceSq(this.destination) > 2 && !(this.isBlockPrepared(this.destination)));
 	}
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
+		this.drone.getNavigator().tryMoveToXYZ(this.destination.getX(), this.destination.getY(), this.destination.getZ(), this.drone.getSpeed((float) this.drone.getDistance(this.destination.getX(), this.destination.getY(), this.destination.getZ())));
 	}
 
+	@Override
 	public void updateTask() {
-		if (this.drone.isInWater()&&this.drone.getRNG().nextFloat() < 0.8F)
-        {
-            this.drone.getJumpHelper().setJumping();
-        }
-		
-		if(drone.getDistanceSq(destination.add(0, 1, 0))>1.5*1.5) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
+		if (this.drone.isInWater() && this.drone.getRNG().nextFloat() < 0.8F) {
+			this.drone.getJumpHelper().setJumping();
+		}
+
+		if (this.drone.getDistanceSq(this.destination.add(0, 1, 0)) > 1.5 * 1.5) {
+			this.drone.getNavigator().tryMoveToXYZ(this.destination.getX(), this.destination.getY(), this.destination.getZ(), this.drone.getSpeed((float) this.drone.getDistance(this.destination.getX(), this.destination.getY(), this.destination.getZ())));
 		} else {
-			if(water) {
-				drone.world.destroyBlock(destination, true);
-				drone.world.setBlockState(destination, Blocks.WATER.getDefaultState());
+			if (this.water) {
+				this.drone.world.destroyBlock(this.destination, true);
+				this.drone.world.setBlockState(this.destination, Blocks.WATER.getDefaultState());
 			} else {
-				if(drone.world.getBlockState(destination).getBlock()!=Blocks.DIRT&&drone.world.getBlockState(destination).getBlock()!=Blocks.GRASS) {
-					drone.world.destroyBlock(destination, true);
+				if (this.drone.world.getBlockState(this.destination).getBlock() != Blocks.DIRT && this.drone.world.getBlockState(this.destination).getBlock() != Blocks.GRASS) {
+					this.drone.world.destroyBlock(this.destination, true);
 				}
-				
-				drone.world.setBlockState(destination, Blocks.FARMLAND.getDefaultState());
+
+				this.drone.world.setBlockState(this.destination, Blocks.FARMLAND.getDefaultState());
 			}
 		}
 	}
-	
+
 	public boolean isPrepared() {
-		return prepared;
+		return this.prepared;
 	}
-	
+
 	boolean isBlockPrepared(BlockPos pos) {
-		if(water) {
-			return drone.world.getBlockState(pos).getBlock() == Blocks.WATER;
+		if (this.water) {
+			return this.drone.world.getBlockState(pos).getBlock() == Blocks.WATER;
 		} else {
-			return drone.world.getBlockState(pos).getBlock() == Blocks.FARMLAND;
+			return this.drone.world.getBlockState(pos).getBlock() == Blocks.FARMLAND;
 		}
 	}
 
 	boolean searchUnpreparedWater() {
 		BlockPos homepos = new BlockPos(this.drone.getHomePosition());
 
-		for (int xOffset = -range; xOffset < range; xOffset++) {
-			if(xOffset%waterDist!=0) continue;
-			
-			for (int zOffset = -range; zOffset < range; zOffset++) {
-				if(zOffset%waterDist!=0) continue;
-				
+		for (int xOffset = -this.range; xOffset < this.range; xOffset++) {
+			if (xOffset % this.waterDist != 0) {
+				continue;
+			}
+
+			for (int zOffset = -this.range; zOffset < this.range; zOffset++) {
+				if (zOffset % this.waterDist != 0) {
+					continue;
+				}
+
 				BlockPos pos = homepos.add(xOffset, -1, zOffset);
 
-				IBlockState blockstate = drone.world.getBlockState(pos);
-				if (!blockstate.getBlock().equals(Blocks.WATER)&&!blockstate.getBlock().equals(Blocks.FLOWING_WATER)) {
-					destination = pos;
-					water = true;
-					prepared = false;
+				IBlockState blockstate = this.drone.world.getBlockState(pos);
+				if (!blockstate.getBlock().equals(Blocks.WATER) && !blockstate.getBlock().equals(Blocks.FLOWING_WATER)) {
+					this.destination = pos;
+					this.water = true;
+					this.prepared = false;
 					return true;
 				}
 			}
@@ -106,17 +110,23 @@ public class EntityAIPrepareFarmland extends EntityAIBase {
 	boolean searchUnpreparedFarmland() {
 		BlockPos homepos = new BlockPos(this.drone.getHomePosition());
 
-		for (int xOffset = -range; xOffset <= range; xOffset++) {
-			for (int zOffset = -range; zOffset <= range; zOffset++) {
-				if(xOffset%waterDist==0&&zOffset%waterDist==0) continue;
+		for (int xOffset = -this.range; xOffset <= this.range; xOffset++) {
+			for (int zOffset = -this.range; zOffset <= this.range; zOffset++) {
+				if (xOffset % this.waterDist == 0 && zOffset % this.waterDist == 0) {
+					continue;
+				}
 				BlockPos pos = homepos.add(xOffset, -1, zOffset);
 
-				IBlockState blockstate = drone.world.getBlockState(pos);
-				if (!blockstate.getBlock().equals(Blocks.FARMLAND)) {
-					destination = pos;
-					water = false;
-					prepared = false;
-					return true;
+				IBlockState blockstate = this.drone.world.getBlockState(pos);
+				if (!(blockstate.getBlock() == Blocks.FARMLAND)) {
+					if (blockstate.getBlock() == Blocks.DIRT || blockstate.getBlock() == Blocks.GRASS) {
+						this.destination = pos;
+						this.water = false;
+						this.prepared = false;
+						return true;
+					} else {
+						this.prepared = false;
+					}
 				}
 			}
 		}

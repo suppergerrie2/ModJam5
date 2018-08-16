@@ -15,9 +15,9 @@ public class EntityAIPrepareLand extends EntityAIBase {
 
 	BlockPos destination;
 	boolean done = false;
-	
+
 	int waterDist = 9;
-	
+
 	public EntityAIPrepareLand(EntityCropFarmDrone entityCropFarmDrone) {
 		this.drone = entityCropFarmDrone;
 		this.setMutexBits(7);
@@ -25,65 +25,66 @@ public class EntityAIPrepareLand extends EntityAIBase {
 
 	@Override
 	public boolean shouldExecute() {
-		done = true;
-		range = drone.getRange();
-		return this.searchUnpreparedLand()&&drone.hasDirt();
+		this.done = true;
+		this.range = this.drone.getRange();
+		return this.searchUnpreparedLand();
 	}
 
 	@Override
 	public boolean shouldContinueExecuting() {
-		boolean isCorrect = destroy?drone.world.isAirBlock(destination):!this.shouldReplace(destination);
-		return (drone.getDistanceSq(destination)>2*2&&!isCorrect);
+		boolean isCorrect = this.destroy ? this.drone.world.isAirBlock(this.destination) : !this.shouldReplace(this.destination);
+		return (this.drone.getDistanceSq(this.destination) > 2 * 2 && !isCorrect);
 	}
 
 	@Override
 	public void startExecuting() {
-		drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
+		this.drone.getNavigator().tryMoveToXYZ(this.destination.getX(), this.destination.getY(), this.destination.getZ(), this.drone.getSpeed((float) this.drone.getDistance(this.destination.getX(), this.destination.getY(), this.destination.getZ())));
 	}
 
+	@Override
 	public void updateTask() {
-		if(this.drone.world.getBlockState(drone.getPosition()).causesSuffocation()) {
+		if (this.drone.world.getBlockState(this.drone.getPosition()).causesSuffocation()) {
 			this.drone.getJumpHelper().setJumping();
 		}
-		if(drone.getDistanceSq(destination.add(0, 1, 0))>3*3) {
-			drone.getNavigator().tryMoveToXYZ(destination.getX(), destination.getY(), destination.getZ(), drone.getSpeed((float) drone.getDistance(destination.getX(), destination.getY(), destination.getZ())));
+		if (this.drone.getDistanceSq(this.destination.add(0, 1, 0)) > 3 * 3) {
+			this.drone.getNavigator().tryMoveToXYZ(this.destination.getX(), this.destination.getY(), this.destination.getZ(), this.drone.getSpeed((float) this.drone.getDistance(this.destination.getX(), this.destination.getY(), this.destination.getZ())));
 		} else {
-			if(destroy) {
-				drone.world.destroyBlock(destination, true);
+			if (this.destroy) {
+				this.drone.world.destroyBlock(this.destination, true);
 			} else {
-				drone.world.setBlockState(destination, Blocks.DIRT.getDefaultState());
-				drone.world.destroyBlock(destination.up(), true);
-				drone.useDirt();
+				this.drone.world.setBlockState(this.destination, Blocks.DIRT.getDefaultState());
+				this.drone.world.destroyBlock(this.destination.up(), true);
+				this.drone.useDirt();
 			}
 		}
 	}
 
 	boolean destroy = false;
-	
+
 	boolean searchUnpreparedLand() {
 		BlockPos homepos = new BlockPos(this.drone.getHomePosition());
 
-		for (int xOffset = -range; xOffset <= range; xOffset++) {
-			for (int zOffset = -range; zOffset <= range; zOffset++) {
-				if(zOffset%waterDist==0&&xOffset%waterDist==0) {
+		for (int xOffset = -this.range; xOffset <= this.range; xOffset++) {
+			for (int zOffset = -this.range; zOffset <= this.range; zOffset++) {
+				if (zOffset % this.waterDist == 0 && xOffset % this.waterDist == 0) {
 					continue;
 				}
 				BlockPos pos = homepos.add(xOffset, -1, zOffset);
 
-				if (drone.world.isAirBlock(pos)) {
-					destination = pos;
-					destroy = false;
-					done = false;
+				if (this.drone.world.isAirBlock(pos) && this.drone.hasDirt()) {
+					this.destination = pos;
+					this.destroy = false;
+					this.done = false;
 					return true;
-				} else if(!drone.world.isAirBlock(pos.up())&&!(drone.world.getBlockState(pos.up()).getBlock() instanceof BlockCrops)) {
-					destination = pos.up();
-					destroy = true;
-					done = false;
+				} else if (!this.drone.world.isAirBlock(pos.up()) && !(this.drone.world.getBlockState(pos.up()).getBlock() instanceof BlockCrops)) {
+					this.destination = pos.up();
+					this.destroy = true;
+					this.done = false;
 					return true;
-				} else if(this.shouldReplace(pos)) {
-					destination = pos;
-					destroy = true;
-					done = false;
+				} else if (this.shouldReplace(pos) && this.drone.hasDirt()) {
+					this.destination = pos;
+					this.destroy = true;
+					this.done = false;
 					return true;
 				}
 			}
@@ -91,13 +92,13 @@ public class EntityAIPrepareLand extends EntityAIBase {
 
 		return false;
 	}
-	
+
 	boolean shouldReplace(BlockPos pos) {
-		Block block = drone.world.getBlockState(pos).getBlock();
-		return !(block==Blocks.FARMLAND||block==Blocks.DIRT||block==Blocks.GRASS);
+		Block block = this.drone.world.getBlockState(pos).getBlock();
+		return !(block == Blocks.FARMLAND || block == Blocks.DIRT || block == Blocks.GRASS);
 	}
 
 	public boolean isDone() {
-		return done;
+		return this.done;
 	}
 }

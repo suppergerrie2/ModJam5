@@ -15,6 +15,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -23,22 +24,9 @@ import net.minecraftforge.common.IPlantable;
 public class EntityCropFarmDrone extends EntityBasicDrone {
 
 	public EntityCropFarmDrone(World worldIn) {
-		// this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
 		super(worldIn);
+		((PathNavigateGround) this.getNavigator()).setCanSwim(true);
 	}
-
-	// public EntityCropFarmDrone(World worldIn, double x, double y, double z,
-	// ItemStack spawnedWith, EnumFacing facing) {
-	// this(worldIn, x, y, z, spawnedWith, facing, 1);
-	// }
-	//
-	// @Deprecated
-	// public EntityCropFarmDrone(World worldIn, double x, double y, double z,
-	// ItemStack spawnedWith, EnumFacing facing, int carrySize) {
-	// super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-	// this.setRange(4);
-	// ((PathNavigateGround)this.getNavigator()).setCanSwim(true);
-	// }
 
 	@Override
 	public void init(double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
@@ -70,11 +58,15 @@ public class EntityCropFarmDrone extends EntityBasicDrone {
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (!this.world.isRemote) {
+
 			if (this.aiPrepareFarmLand.isPrepared()) {
+
 				if (this.hasDirt()) {
+
 					if (this.getDistanceSq(this.getHomePosition()) < 4) {
 						this.insertItemsInBlock(this.getHomePosition());
 					}
+
 				} else if (!this.hasSeeds() && this.getDistanceSq(this.getHomePosition()) < 4) {
 					this.tryGetItem(null, this.getHomePosition(), new Predicate<Item>() {
 
@@ -84,6 +76,7 @@ public class EntityCropFarmDrone extends EntityBasicDrone {
 						}
 					});
 				}
+
 			} else {
 				if (!this.hasDirt() && this.getDistanceSq(this.getHomePosition()) < 4) {
 					this.tryGetItem(Item.getItemFromBlock(Blocks.DIRT), this.getHomePosition(), null);
