@@ -23,5 +23,6 @@ dronestick.message.sethome=Right click on block to set home.
 
 upgrade_tooltip=%1$s, level: %2$s
 sdrones_storage=Storage Upgrade
+upgrade_drone=Upgrade Drone
 
 itemGroup.tabDronesMod=Drones
