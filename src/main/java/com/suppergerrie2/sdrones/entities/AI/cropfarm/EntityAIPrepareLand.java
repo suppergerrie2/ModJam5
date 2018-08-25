@@ -71,7 +71,7 @@ public class EntityAIPrepareLand extends EntityAIBase {
 				}
 				BlockPos pos = homepos.add(xOffset, -1, zOffset);
 
-				if (this.drone.world.isAirBlock(pos) && this.drone.hasDirt()) {
+				if ((this.drone.world.isAirBlock(pos) || this.drone.world.getBlockState(pos).getBlock().isReplaceable(this.drone.world, pos)) && this.drone.hasDirt()) {
 					this.destination = pos;
 					this.destroy = false;
 					this.done = false;
