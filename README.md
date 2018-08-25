@@ -5,6 +5,8 @@ You can also join a discord server [here](https://discord.gg/VHD4Ptm) this serve
 
 Download the mod at the [curseforge page](https://minecraft.curseforge.com/projects/suppergerrie2s-drone-mod).
 
+# Basic information
+
 Adds five types of drones:
 1. Hauler drone: searches items in the world and brings them to its home.
 2. Fighter drone: fights mobs around it.
@@ -24,3 +26,24 @@ TODO:
 - [ ] Mining drone
 - [ ] Transport drone
 - [x] Crop farm drone
+- [ ] Upgrades (Check issue #16)
+
+# Want to help?
+
+### Found a bug or have an idea?
+Report the bug (or your idea!) by clicking [here](https://github.com/suppergerrie2/ModJam5/issues/new).
+- Make sure the bug or idea hasn't been posted before by checking the other [issues](https://github.com/suppergerrie2/ModJam5/issues).
+- Please check if the bug occurs without any other mods installed!
+
+### Want to help develop the mod?
+1. Make sure you have git installed. [Github help page](https://help.github.com/articles/set-up-git/)
+2. Clone this repository: `git clone https://github.com/suppergerrie2/ModJam5.git`
+
+If you just want to translate or don't need to launch the game you can start editing now! Else follow the instructions to setup a forge environment.
+
+3. Download an IDE like [eclipse](https://www.eclipse.org/home/index.php) and install it.
+4. Setup a forge environment by running `gradlew setupDecompWorkspace`
+   If you are using eclipse you also need to run `gradlew eclipse`
+5. Now launch your IDE and import the folder you cloned this repository in as a project.
+
+Now you can also launch the game and edit the code! For more information you can go to [my modding tutorial](https://www.suppergerrie2.com/minecraft-1-12-modding-with-forge-1-getting-started/)
