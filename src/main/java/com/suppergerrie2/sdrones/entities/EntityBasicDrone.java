@@ -216,7 +216,6 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-		this.setGlowing(this.selected);
 
 		this.pushOutOfBlocks(this.posX, (this.getEntityBoundingBox().minY + this.getEntityBoundingBox().maxY) / 2.0D, this.posZ);
 	}
@@ -231,6 +230,16 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 	@Override
 	public boolean canTrample(World world, Block block, BlockPos pos, float fallDistance) {
+		return false;
+	}
+
+	@Override
+	public boolean isGlowing() {
+
+		if (super.isGlowing() || (this.selected && this.world.isRemote)) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -341,11 +350,11 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 
 	@Override
 	public boolean processInteract(EntityPlayer player, EnumHand hand) {
-		if (!this.world.isRemote && player.getHeldItem(hand).getItem() instanceof ItemDroneStick) {
-			if (player.isSneaking()) {
+		if (player.getHeldItem(hand).getItem() instanceof ItemDroneStick) {
+			if (player.isSneaking() && !this.world.isRemote) {
 				this.setDead();
 				this.onDeath(DamageSource.causePlayerDamage(player));
-			} else {
+			} else if (!player.isSneaking()) {
 				ItemDroneStick.addSelected(this, player.getHeldItem(hand));
 				this.selected = true;
 			}

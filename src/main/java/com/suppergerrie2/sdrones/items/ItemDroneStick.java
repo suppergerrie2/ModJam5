@@ -92,7 +92,7 @@ public class ItemDroneStick extends ItemBasic {
 
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-		if (!worldIn.isRemote && playerIn.isSneaking()) {
+		if (playerIn.isSneaking()) {
 			this.clearSelected(playerIn.getHeldItem(handIn), worldIn);
 		}
 
