@@ -150,6 +150,8 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		compound.setString("HomeFacing", this.homeFacing.getName());
 
 		compound.setInteger("Range", this.getRange());
+
+		compound.setDouble("Speed", this.speed);
 	}
 
 	@Override
@@ -197,6 +199,10 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 			if (this instanceof EntityCropFarmDrone) {
 				this.setRange(4);
 			}
+		}
+
+		if (compound.hasKey("Speed")) {
+			this.setSpeed(compound.getDouble("Speed"));
 		}
 	}
 
