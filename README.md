@@ -37,7 +37,7 @@ Report the bug (or your idea!) by clicking [here](https://github.com/suppergerri
 
 ### Want to help develop the mod?
 1. Make sure you have git installed. [Github help page](https://help.github.com/articles/set-up-git/)
-2. Clone this repository: `git clone https://github.com/suppergerrie2/ModJam5.git`
+2. Fork this repository by clicking fork in the top right. [Github help page](https://guides.github.com/activities/forking/)
 
 If you just want to translate or don't need to launch the game you can start editing now! Else follow the instructions to setup a forge environment.
 
@@ -45,5 +45,7 @@ If you just want to translate or don't need to launch the game you can start edi
 4. Setup a forge environment by running `gradlew setupDecompWorkspace`
    If you are using eclipse you also need to run `gradlew eclipse`
 5. Now launch your IDE and import the folder you cloned this repository in as a project.
+
+After making the changes you can send a pull request! [Github help page](https://guides.github.com/activities/forking/)
 
 Now you can also launch the game and edit the code! For more information you can go to [my modding tutorial](https://www.suppergerrie2.com/minecraft-1-12-modding-with-forge-1-getting-started/)
