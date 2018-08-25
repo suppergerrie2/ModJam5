@@ -402,6 +402,11 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		}
 	}
 
+	@Override
+	protected float getJumpUpwardsMotion() {
+		return 0.5F;
+	}
+
 	public boolean canPickupItem(ItemStack item) {
 		if (this.filter.size() > 0) {
 			boolean isInFilter = false;
