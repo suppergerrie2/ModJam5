@@ -24,20 +24,9 @@ import net.minecraft.world.World;
 public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 	public EntityTreeFarmDrone(World worldIn) {
-		//		this(worldIn, -1, -1, -1, ItemStack.EMPTY, EnumFacing.UP);
 		super(worldIn);
 		this.setRange(16);
 	}
-
-	/*public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-		this(worldIn, x, y, z, spawnedWith, facing, 1);
-	}
-	
-	@Deprecated
-	public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing,
-			int carrySize) {
-		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-	}*/
 
 	@Override
 	protected void initEntityAI() {

@@ -8,15 +8,16 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 /**
- * This arrow can't hit the archer drones, this means the archer drones can be in a great group and not hit eachother.
- * This arrow also sets the hurtresistanttime of the target to 0. Cheaty right :P
+ * This arrow can't hit the archer drones, this means the archer drones can be
+ * in a great group and not hit each other. This arrow also sets the
+ * hurtresistanttime of the target to 0. Cheaty right :P
  */
 public class EntityDroneArrow extends EntityArrow {
 
 	public EntityDroneArrow(World worldIn) {
 		super(worldIn);
 	}
-	
+
 	public EntityDroneArrow(World worldIn, EntityLivingBase shooter) {
 		super(worldIn, shooter);
 	}
@@ -29,24 +30,23 @@ public class EntityDroneArrow extends EntityArrow {
 	@Override
 	protected void onHit(RayTraceResult raytraceResultIn) {
 		Entity entity = raytraceResultIn.entityHit;
-		if(entity!=null&&entity instanceof EntityArcherDrone) {
+		if (entity != null && entity instanceof EntityArcherDrone) {
 			return;
 		}
-		if (entity instanceof EntityLivingBase)
-        {
-            EntityLivingBase entitylivingbase = (EntityLivingBase)entity;
-            entitylivingbase.hurtResistantTime = 0;
-        }
-		
+		if (entity instanceof EntityLivingBase) {
+			EntityLivingBase entitylivingbase = (EntityLivingBase) entity;
+			entitylivingbase.hurtResistantTime = 0;
+		}
+
 		super.onHit(raytraceResultIn);
 	}
-	
-	public void onUpdate()
-    {
+
+	@Override
+	public void onUpdate() {
 		super.onUpdate();
-		
-		if(this.inGround) {
+
+		if (this.inGround) {
 			this.setDead();
-    }
-    }
+		}
+	}
 }

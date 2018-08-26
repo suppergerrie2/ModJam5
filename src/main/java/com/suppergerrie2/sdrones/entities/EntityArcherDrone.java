@@ -34,15 +34,6 @@ public class EntityArcherDrone extends EntityBasicDrone implements IRangedAttack
 		this.setRange(16);
 	}
 
-	/*public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-		this(worldIn, x, y, z, spawnedWith, facing, 1);
-	}
-	
-	@Deprecated
-	public EntityArcherDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
-		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-	}*/
-
 	@Override
 	protected void initEntityAI() {
 		super.initEntityAI();
