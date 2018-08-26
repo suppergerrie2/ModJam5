@@ -38,6 +38,7 @@ public class EntityCropFarmDrone extends EntityBasicDrone {
 
 	@Override
 	protected void initEntityAI() {
+		super.initEntityAI();
 		// 13
 		EntityAIPrepareLand aiPrepareLand = new EntityAIPrepareLand(this);
 		this.tasks.addTask(0, aiPrepareLand);

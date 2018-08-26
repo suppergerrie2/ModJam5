@@ -21,67 +21,67 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
 public class EntityFighterDrone extends EntityBasicDrone {
-	
+
 	//TODO: Variable weapons?
 	public EntityFighterDrone(World worldIn) {
-//		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
+		//		this(worldIn, 0, 0, 0, ItemStack.EMPTY, EnumFacing.UP);
 		super(worldIn);
 	}
 
-//	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
-//		this(worldIn, x, y, z, spawnedWith, facing, 1);
-//	}
-//
-//	@Deprecated
-//	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
-//		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
-//		this.setRange(16);
-//	}
+	//	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
+	//		this(worldIn, x, y, z, spawnedWith, facing, 1);
+	//	}
+	//
+	//	@Deprecated
+	//	public EntityFighterDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing, int carrySize) {
+	//		super(worldIn, x, y, z, spawnedWith, facing, carrySize);
+	//		this.setRange(16);
+	//	}
 
 	@Override
 	protected void initEntityAI() {
+		super.initEntityAI();
+
 		this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
 		this.tasks.addTask(1, new EntityAIGoHome(this));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
-		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, true, true, new Predicate<EntityLiving>()
-        {
-            public boolean apply(@Nullable EntityLiving possibleTarget)
-            {
-                return possibleTarget != null && !(possibleTarget instanceof EntityCreeper);
-            }
-        }));
-		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntitySlime>(this, EntitySlime.class, true, true));
-		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityShulker>(this, EntityShulker.class, true, true));
+		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityMob>(this, EntityMob.class, 10, false, true, new Predicate<EntityLiving>() {
+
+			@Override
+			public boolean apply(@Nullable EntityLiving possibleTarget) {
+				return possibleTarget != null && !(possibleTarget instanceof EntityCreeper);
+			}
+		}));
+		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntitySlime>(this, EntitySlime.class, false, true));
+		this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<EntityShulker>(this, EntityShulker.class, false, true));
 	}
 
 	@Override
-	protected void applyEntityAttributes()
-	{
+	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
-		
+
 		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 		this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(7.0D);
-	}	
+	}
 
 	@Override
-	public boolean attackEntityAsMob(Entity entityIn)
-	{
+	public boolean attackEntityAsMob(Entity entityIn) {
 		return entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), 7);
 	}
-	
+
+	@Override
 	public ItemStack getTool() {
 		return new ItemStack(Items.DIAMOND_SWORD);
 	}
-	
+
 	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 
-		if (this.getHealth() < this.getMaxHealth() && this.ticksExisted % 20 == 0)
-        {
-            this.heal(1.0F);
-        }
+		if (this.getHealth() < this.getMaxHealth() && this.ticksExisted % 20 == 0) {
+			this.heal(1.0F);
+		}
 	}
 
 }

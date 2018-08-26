@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+import com.suppergerrie2.sdrones.entities.pathfinding.PathNavigateDrone;
 import com.suppergerrie2.sdrones.init.ModSoundEvents;
 import com.suppergerrie2.sdrones.items.ItemDroneStick;
 import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
@@ -15,12 +16,14 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.EntityAIOpenDoor;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
@@ -54,7 +57,7 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 		super(worldIn);
 		this.setSize(0.3f, 0.3f);
 		this.enablePersistence();
-		this.setPathPriority(PathNodeType.WATER, -1.0f);
+		this.setPathPriority(PathNodeType.WATER, 0f);
 	}
 
 	public void init(double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
@@ -66,7 +69,14 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	}
 
 	@Override
-	protected abstract void initEntityAI();
+	protected void initEntityAI() {
+		this.tasks.addTask(0, new EntityAIOpenDoor(this, true));
+	};
+
+	@Override
+	protected PathNavigate createNavigator(World worldIn) {
+		return new PathNavigateDrone(this, worldIn);
+	}
 
 	void setupItemStacksInDrone(int size) {
 		if (size > 0) {
@@ -420,6 +430,18 @@ public abstract class EntityBasicDrone extends EntityCreature implements IEntity
 	@Override
 	protected float getJumpUpwardsMotion() {
 		return 0.5F;
+	}
+
+	@Override
+	protected int decreaseAirSupply(int air) {
+		return air;
+	}
+
+	@Override
+	public boolean handleWaterMovement() {
+		//		System.out.println(this.fallDistance > 1 ? super.handleWaterMovement() : false);
+		this.world.getBlockState(this.getPosition()).getBlock().getAiPathNodeType(this.world.getBlockState(this.getPosition()), this.world, this.getPosition());
+		return false;
 	}
 
 	public boolean canPickupItem(ItemStack item) {

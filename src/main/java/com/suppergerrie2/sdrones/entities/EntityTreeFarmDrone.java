@@ -24,16 +24,15 @@ import net.minecraft.world.World;
 public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 	public EntityTreeFarmDrone(World worldIn) {
-//		this(worldIn, -1, -1, -1, ItemStack.EMPTY, EnumFacing.UP);
+		//		this(worldIn, -1, -1, -1, ItemStack.EMPTY, EnumFacing.UP);
 		super(worldIn);
 		this.setRange(16);
 	}
 
-
 	/*public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing) {
 		this(worldIn, x, y, z, spawnedWith, facing, 1);
 	}
-
+	
 	@Deprecated
 	public EntityTreeFarmDrone(World worldIn, double x, double y, double z, ItemStack spawnedWith, EnumFacing facing,
 			int carrySize) {
@@ -42,12 +41,15 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 	@Override
 	protected void initEntityAI() {
+		super.initEntityAI();
+
 		this.tasks.addTask(0, new EntityAIPlantSapling(this));
 		this.tasks.addTask(0, new EntityAICutTree(this));
 		this.tasks.addTask(1, new EntityAIGoHome(this));
 		this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
 	}
 
+	@Override
 	public ItemStack getTool() {
 		return new ItemStack(Items.DIAMOND_AXE);
 	}
@@ -55,9 +57,10 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
-		if(!this.world.isRemote) {
-			if(!this.hasSapling()&&this.getDistanceSq(this.getHomePosition())<4) {
+		if (!this.world.isRemote) {
+			if (!this.hasSapling() && this.getDistanceSq(this.getHomePosition()) < 4) {
 				this.tryGetItem(null, this.getHomePosition(), new Predicate<Item>() {
+
 					@Override
 					public boolean apply(Item input) {
 						return Block.getBlockFromItem(input) instanceof BlockSapling;
@@ -65,10 +68,10 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 				});
 			}
 
-			for(int x = -1; x <= 1; x++) {
-				for(int y = -1; y <= 1; y++) {
-					if(this.world.getBlockState(getPosition().add(x,0,y)).getBlock() instanceof BlockLeaves) {
-						this.world.destroyBlock(getPosition().add(x,0,y), true);
+			for (int x = -1; x <= 1; x++) {
+				for (int y = -1; y <= 1; y++) {
+					if (this.world.getBlockState(this.getPosition().add(x, 0, y)).getBlock() instanceof BlockLeaves) {
+						this.world.destroyBlock(this.getPosition().add(x, 0, y), true);
 					}
 				}
 			}
@@ -76,9 +79,9 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 	}
 
 	boolean hasSapling() {
-		for(ItemStack stack : getItemStacksInDrone()) {
-			if(stack!=null&&!stack.isEmpty()) {
-				if(Block.getBlockFromItem(stack.getItem()) instanceof BlockSapling) {
+		for (ItemStack stack : this.getItemStacksInDrone()) {
+			if (stack != null && !stack.isEmpty()) {
+				if (Block.getBlockFromItem(stack.getItem()) instanceof BlockSapling) {
 					return true;
 				}
 			}
@@ -89,12 +92,12 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 	public ItemStack getSapling() {
 		ItemStack[] stacks = this.getItemStacksInDrone();
-		for(int i = 0; i < stacks.length; i++) {
-			if(stacks[i].isEmpty()) {
+		for (int i = 0; i < stacks.length; i++) {
+			if (stacks[i].isEmpty()) {
 				continue;
 			}
 
-			if(Block.getBlockFromItem(stacks[i].getItem()) instanceof BlockSapling){
+			if (Block.getBlockFromItem(stacks[i].getItem()) instanceof BlockSapling) {
 				return stacks[i];
 			}
 		}
@@ -103,29 +106,30 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 	public void useSapling() {
 		ItemStack[] stacks = this.getItemStacksInDrone();
-		for(int i = 0; i < stacks.length; i++) {
-			if(stacks[i].isEmpty()) {
+		for (int i = 0; i < stacks.length; i++) {
+			if (stacks[i].isEmpty()) {
 				continue;
 			}
 
-			if(Block.getBlockFromItem(stacks[i].getItem()) instanceof BlockSapling){
+			if (Block.getBlockFromItem(stacks[i].getItem()) instanceof BlockSapling) {
 				stacks[i].shrink(1);
 			}
 		}
-		this.setItemStacksInDrone(stacks);;
+		this.setItemStacksInDrone(stacks);
+		;
 	}
 
 	public boolean placeSapling(BlockPos destination) {
 		ItemStack sapling = this.getSapling();
 
-		if(sapling.isEmpty()) {
+		if (sapling.isEmpty()) {
 			return false;
 		}
 
 		Block blockToPlace = Block.getBlockFromItem(sapling.getItem());
-		IBlockState blockstate = blockToPlace.getStateForPlacement(world, destination, EnumFacing.DOWN, 8, 8, 8, sapling.getMetadata(), this, EnumHand.MAIN_HAND);
+		IBlockState blockstate = blockToPlace.getStateForPlacement(this.world, destination, EnumFacing.DOWN, 8, 8, 8, sapling.getMetadata(), this, EnumHand.MAIN_HAND);
 
-		world.setBlockState(destination, blockstate);
+		this.world.setBlockState(destination, blockstate);
 
 		this.useSapling();
 
@@ -137,10 +141,12 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 		treePositions.add(destination);
 
-		while(walkTree(treePositions));
+		while (this.walkTree(treePositions)) {
+			;
+		}
 
-		for(BlockPos pos : treePositions) {
-			world.destroyBlock(pos, true);
+		for (BlockPos pos : treePositions) {
+			this.world.destroyBlock(pos, true);
 		}
 	}
 
@@ -148,13 +154,13 @@ public class EntityTreeFarmDrone extends EntityBasicDrone {
 
 		boolean modified = false;
 		List<BlockPos> copy = new ArrayList<BlockPos>(positions);
-		for(BlockPos pos : copy) {
-			for(int x = -1; x <= 1; x++) {
-				for(int z = -1; z <= 1; z++) {
-					for(int y = 0; y <= 1; y++) {
-						BlockPos pos2 = pos.add(x,y,z);
+		for (BlockPos pos : copy) {
+			for (int x = -1; x <= 1; x++) {
+				for (int z = -1; z <= 1; z++) {
+					for (int y = 0; y <= 1; y++) {
+						BlockPos pos2 = pos.add(x, y, z);
 
-						if(!positions.contains(pos2)&&this.world.getBlockState(pos2).getBlock().isWood(world, pos2)) {
+						if (!positions.contains(pos2) && this.world.getBlockState(pos2).getBlock().isWood(this.world, pos2)) {
 							positions.add(pos2);
 							modified = true;
 						}
