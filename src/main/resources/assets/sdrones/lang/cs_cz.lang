@@ -1,0 +1,28 @@
+item.item_hauler_drone.name=Dopravní Dron
+item.item_fighter_drone.name=Bojovací Dron
+item.item_tree_farm_drone.name=Dron na farmeření stromů
+item.item_crop_farm_drone.name=Dron na farmaření sazenic
+item.item_archer_drone.name=Lučišnický Dron
+
+item.drone_stick.name=Tyčka na Drony
+
+entity.hauler_drone.name=Dopravní Dron
+entity.fighter_drone.name=Bojovací Dron
+entity.tree_farm_drone.name=Dron na farmeření stromů
+entity.crop_farm_drone.name=Dron na farmaření sazenic
+entity.archer_drone.name=Lučišnický Dron
+entity.drone_arrow.name=Šíp
+
+sdrones.subtitle.drone_bleep=Dron houká
+sdrones.subtitle.drone_driving=Dron se potápí
+
+dronestick.message.select=Pravé tlačítko pro vybrání dronu.
+dronestick.message.deselect=Shift+Pravé tlačítko ve vzduchu pro zrušení výběru dronů.
+dronestick.message.kill=Shift+Pravé tlačítko na dron pro zničení.
+dronestick.message.sethome=Pravé tlačítko na blok pro nastavení domova dronu.
+
+upgrade_tooltip=%1$s, úroveň: %2$s
+sdrones_storage=Vylepšení Uskladnění
+upgrade_drone=Vylepšení Dronu 
+
+itemGroup.tabDronesMod=Drony
