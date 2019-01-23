@@ -1,0 +1,28 @@
+item.item_hauler_drone.name=Drone Transporteur
+item.item_fighter_drone.name=Drone Combattant
+item.item_tree_farm_drone.name=Drone Bucheron
+item.item_crop_farm_drone.name=Drone Fermier
+item.item_archer_drone.name=Drone Archer
+
+item.drone_stick.name=Drone Stick
+
+entity.hauler_drone.name=Drone Transporteur
+entity.fighter_drone.name=Drone Combattant
+entity.tree_farm_drone.name=Drone Bucheron
+entity.crop_farm_drone.name=Drone Fermier
+entity.archer_drone.name=Drone Archer
+entity.drone_arrow.name=Flèche
+
+sdrones.subtitle.drone_bleep=Bip de Drone
+sdrones.subtitle.drone_driving=Drone en mouvement
+
+dronestick.message.select=Clique Droit pour selectionner un Drone.
+dronestick.message.deselect=Shift+Clique Droit en l'air pour déselectionner les Drones.
+dronestick.message.kill=Shift+Clique Droit sur un Drone pour le tuer.
+dronestick.message.sethome=Clique Droit sur un Bloc pour définir sa "maison".
+
+upgrade_tooltip=%1$s, level: %2$s
+sdrones_storage=Amélioration de Stockage
+upgrade_drone=Amélioration de Drone
+
+itemGroup.tabDronesMod=Drones
