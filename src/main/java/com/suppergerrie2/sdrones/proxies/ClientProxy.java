@@ -1,5 +1,6 @@
 package com.suppergerrie2.sdrones.proxies;
 
+import com.suppergerrie2.sdrones.config.DronesConfig;
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
 import com.suppergerrie2.sdrones.entities.EntityCropFarmDrone;
 import com.suppergerrie2.sdrones.entities.EntityDroneArrow;
@@ -73,6 +74,8 @@ public class ClientProxy implements IProxy {
 				return new RenderCustomArrow(manager);
 			}
 		});
+
+		DronesConfig.clientPreInit();
 	}
 
 	@Override

@@ -26,3 +26,10 @@ sdrones_storage=庫藏升級
 upgrade_drone=升級機器人
 
 itemGroup.tabDronesMod=機器人
+
+gui.config.drones.is_recipe_hauler_drone=合成搬運機器人
+gui.config.drones.is_recipe_fighter_drone=合成格鬥機器人
+gui.config.drones.is_recipe_tree_farm_drone=合成伐木機器人
+gui.config.drones.is_recipe_crop_farm_drone=合成農耕機器人
+gui.config.drones.is_recipe_archer_drone=合成射手機器人
+gui.config.category.drones=機器人

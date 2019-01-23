@@ -2,6 +2,7 @@ package com.suppergerrie2.sdrones;
 
 import java.util.function.Function;
 
+import com.suppergerrie2.sdrones.config.DronesConfig;
 import org.apache.logging.log4j.Logger;
 
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
@@ -31,7 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
-@Mod(modid = Reference.MODID, name=Reference.MODNAME, version=Reference.VERSION, acceptedMinecraftVersions=Reference.ACCEPTED_MINECRAFT_VERSIONS)
+@Mod(modid = Reference.MODID, name=Reference.MODNAME, version=Reference.VERSION, acceptedMinecraftVersions=Reference.ACCEPTED_MINECRAFT_VERSIONS, guiFactory = Reference.DRONE_CONFIG_GUI_FACTORY)
 @Mod.EventBusSubscriber(modid=Reference.MODID)
 public class DroneMod {
 
@@ -57,18 +58,24 @@ public class DroneMod {
 
 		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, "drone_arrow"), EntityDroneArrow.class, "drone_arrow", entityID++, this, 80, 1, true);
 
+		DronesConfig.preInit();
+
 		proxy.preInit(event);
 		logger.info("preInit");
 	}
 
 	@EventHandler
-	public void init(FMLInitializationEvent event) {
+	public void init(FMLInitializationEvent event)
+	{
 		DronesPacketHandler.register();
+		proxy.init(event);
 		logger.info("init");
 	}
 
 	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
+	public void postInit(FMLPostInitializationEvent event)
+	{
+		proxy.postInit(event);
 		logger.info("postInit");
 	}
 

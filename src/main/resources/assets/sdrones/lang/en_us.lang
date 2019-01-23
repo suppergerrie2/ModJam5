@@ -26,3 +26,10 @@ sdrones_storage=Storage Upgrade
 upgrade_drone=Upgrade Drone
 
 itemGroup.tabDronesMod=Drones
+
+gui.config.drones.is_recipe_hauler_drone=A config of you want you can craft Hauler Drone.
+gui.config.drones.is_recipe_fighter_drone=A config of you want you can craft Fighter Drone.
+gui.config.drones.is_recipe_tree_farm_drone=A config of you want you can craft Tree Farm Drone.
+gui.config.drones.is_recipe_crop_farm_drone=A config of you want you can craft Crop Farm Drone.
+gui.config.drones.is_recipe_archer_drone=A config of you want you can craft Archer Drone.
+gui.config.category.drones=Drones

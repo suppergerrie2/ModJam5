@@ -1,5 +1,6 @@
 package com.suppergerrie2.sdrones.proxies;
 
+import com.suppergerrie2.sdrones.config.DronesConfig;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -7,8 +8,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class ServerProxy implements IProxy {
 
 	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		
+	public void preInit(FMLPreInitializationEvent event)
+	{
 	}
 
 	@Override
