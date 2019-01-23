@@ -23,6 +23,12 @@ dronestick.message.sethome=Right click on block to set home of drone.
 
 upgrade_tooltip=%1$s, level: %2$s
 sdrones_storage=Storage Upgrade
-upgrade_drone=Drone Upgrade 
+upgrade_drone=Drone Upgrade
 
 itemGroup.tabDronesMod=Drones
+
+sdrones.config.enable_archer=Enable Archer Drone
+sdrones.config.enable_crop_farm=Enable Crop Farm Drone
+sdrones.config.enable_fighter=Enable Fighter Drone
+sdrones.config.enable_tree_farm=Enable Tree Farm Drone
+sdrones.config.enable_hauler=Enable Hauler Drone
