@@ -2,6 +2,9 @@ package com.suppergerrie2.sdrones;
 
 import java.util.function.Function;
 
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import org.apache.logging.log4j.Logger;
 
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
@@ -31,14 +34,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
-@Mod(modid = Reference.MODID, name=Reference.MODNAME, version=Reference.VERSION, acceptedMinecraftVersions=Reference.ACCEPTED_MINECRAFT_VERSIONS)
-@Mod.EventBusSubscriber(modid=Reference.MODID)
+import static com.suppergerrie2.sdrones.Reference.MODID;
+
+@Mod(modid = MODID, name=Reference.MODNAME, version=Reference.VERSION, acceptedMinecraftVersions=Reference.ACCEPTED_MINECRAFT_VERSIONS)
+@Mod.EventBusSubscriber(modid= MODID)
 public class DroneMod {
 
 	@Instance
 	public static DroneMod instance;
 
-	@SidedProxy(modId=Reference.MODID,clientSide="com.suppergerrie2.sdrones.proxies.ClientProxy", serverSide="com.suppergerrie2.sdrones.proxies.ServerProxy")
+	@SidedProxy(modId= MODID,clientSide="com.suppergerrie2.sdrones.proxies.ClientProxy", serverSide="com.suppergerrie2.sdrones.proxies.ServerProxy")
 	public static IProxy proxy;
 
 	public static Logger logger;
@@ -55,7 +60,7 @@ public class DroneMod {
 		registerDrone(EntityCropFarmDrone.class, "crop_farm_drone", EntityCropFarmDrone::new);
 		registerDrone(EntityArcherDrone.class, "archer_drone", EntityArcherDrone::new);
 
-		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, "drone_arrow"), EntityDroneArrow.class, "drone_arrow", entityID++, this, 80, 1, true);
+		EntityRegistry.registerModEntity(new ResourceLocation(MODID, "drone_arrow"), EntityDroneArrow.class, "drone_arrow", entityID++, this, 80, 1, true);
 
 		proxy.preInit(event);
 		logger.info("preInit");
@@ -75,15 +80,25 @@ public class DroneMod {
 	@SubscribeEvent
 	public static void registerRegistry(RegistryEvent.NewRegistry event) {
 		new RegistryBuilder<DroneUpgrade>()
-			.setName(new ResourceLocation(Reference.MODID, Reference.UPGRADE_REGISTRY))
+			.setName(new ResourceLocation(MODID, Reference.UPGRADE_REGISTRY))
 			.setType(DroneUpgrade.class)
 			.create();
 	}
 
 	private <T extends EntityBasicDrone> void registerDrone(Class<T> droneClass, String name, Function<World, T> droneCreator) {
-		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, name), droneClass, name, entityID++, this, 80, 1, true);
+		EntityRegistry.registerModEntity(new ResourceLocation(MODID, name), droneClass, name, entityID++, this, 80, 1, true);
 
-		ModItems.registerItem(new ItemSpawnDrone<T>("item_"+name, new ResourceLocation(Reference.MODID, name), droneCreator));
+		ModItems.registerItem(new ItemSpawnDrone<T>("item_"+name, new ResourceLocation(MODID, name), droneCreator));
+	}
+
+
+	@SubscribeEvent
+	public static void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event)
+	{
+		if (event.getModID().equals(MODID))
+		{
+			ConfigManager.sync(MODID, Config.Type.INSTANCE);
+		}
 	}
 
 }
