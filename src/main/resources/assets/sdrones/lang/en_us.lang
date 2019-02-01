@@ -26,3 +26,10 @@ sdrones_storage=Storage Upgrade
 upgrade_drone=Drone Upgrade 
 
 itemGroup.tabDronesMod=Drones
+
+//Configs
+sdrones.config.enable_hauler=Enable Hauler Drone
+sdrones.config.enable_fighter=Enable Fighter Drone
+sdrones.config.enable_tree_farm=Enable Tree Farm Drone
+sdrones.config.enable_crop_farm=Enable Crop Farm Drone
+sdrones.config.enable_archer=Enable Archer Drone

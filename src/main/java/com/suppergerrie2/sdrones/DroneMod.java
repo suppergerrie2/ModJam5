@@ -2,6 +2,9 @@ package com.suppergerrie2.sdrones;
 
 import java.util.function.Function;
 
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import org.apache.logging.log4j.Logger;
 
 import com.suppergerrie2.sdrones.entities.EntityArcherDrone;
@@ -84,6 +87,15 @@ public class DroneMod {
 		EntityRegistry.registerModEntity(new ResourceLocation(Reference.MODID, name), droneClass, name, entityID++, this, 80, 1, true);
 
 		ModItems.registerItem(new ItemSpawnDrone<T>("item_"+name, new ResourceLocation(Reference.MODID, name), droneCreator));
+	}
+
+	@SubscribeEvent
+	public static void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event)
+	{
+		if (event.getModID().equals(Reference.MODID))
+		{
+			ConfigManager.sync(Reference.MODID, Config.Type.INSTANCE);
+		}
 	}
 
 }
