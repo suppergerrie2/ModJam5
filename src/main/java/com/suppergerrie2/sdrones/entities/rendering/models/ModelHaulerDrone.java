@@ -1,14 +1,15 @@
 package com.suppergerrie2.sdrones.entities.rendering.models;
 
-import net.minecraft.client.model.ModelRenderer;
+import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 /**
- * ModelHaulerDroneHaze33E - Haze33E
- * Created using Tabula 7.0.0
+ * ModelHaulerDroneHaze33E - Haze33E Created using Tabula 7.0.0
  */
 public class ModelHaulerDrone extends ModelDrone {
+
     public ModelRenderer bodyMain;
     public ModelRenderer trackLeft;
     public ModelRenderer trackRight;
@@ -55,16 +56,18 @@ public class ModelHaulerDrone extends ModelDrone {
     }
 
     @Override
-    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) { 
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
         GlStateManager.pushMatrix();
-        GlStateManager.translate(this.bodyMain.offsetX, this.bodyMain.offsetY, this.bodyMain.offsetZ);
-        GlStateManager.translate(this.bodyMain.rotationPointX * f5, this.bodyMain.rotationPointY * f5, this.bodyMain.rotationPointZ * f5);
-        GlStateManager.scale(0.3D, 0.3D, 0.3D);
-        GlStateManager.translate(-this.bodyMain.offsetX, -this.bodyMain.offsetY, -this.bodyMain.offsetZ);
-        GlStateManager.translate(-this.bodyMain.rotationPointX * f5, -this.bodyMain.rotationPointY * f5, -this.bodyMain.rotationPointZ * f5);
+        GlStateManager.translated(this.bodyMain.offsetX, this.bodyMain.offsetY, this.bodyMain.offsetZ);
+        GlStateManager.translated(this.bodyMain.rotationPointX * f5, this.bodyMain.rotationPointY * f5, this.bodyMain.rotationPointZ * f5);
+        GlStateManager.scaled(0.3D, 0.3D, 0.3D);
+        GlStateManager.translated(-this.bodyMain.offsetX, -this.bodyMain.offsetY, -this.bodyMain.offsetZ);
+        GlStateManager.translated(-this.bodyMain.rotationPointX * f5, -this.bodyMain.rotationPointY * f5, -this.bodyMain.rotationPointZ * f5);
         this.bodyMain.render(f5);
         GlStateManager.popMatrix();
-        
-        this.renderInventory(entity);
+
+        if (entity instanceof EntityAbstractDrone) {
+            this.renderInventory((EntityAbstractDrone) entity);
+        }
     }
 }

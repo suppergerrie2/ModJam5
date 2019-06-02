@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "sdrones:items/drone_stick"
+    "layer0": "sdrones:items/item_hauler_drone"
   },
   "display": {
     "thirdperson": {

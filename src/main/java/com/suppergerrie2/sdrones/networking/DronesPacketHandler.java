@@ -1,17 +1,27 @@
 package com.suppergerrie2.sdrones.networking;
 
 import com.suppergerrie2.sdrones.Reference;
-import com.suppergerrie2.sdrones.networking.ItemsInDroneMessage.ItemsInDroneMessageHandler;
-
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import java.util.Objects;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class DronesPacketHandler {
 
-	public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.MODID);
-	
-	public static void register() {
-		INSTANCE.registerMessage(ItemsInDroneMessageHandler.class, ItemsInDroneMessage.class, 0, Side.CLIENT);
-	}
+    public static SimpleChannel channel;
+    private static ResourceLocation networkName = new ResourceLocation(Reference.MODID, "net");
+
+    public static void registerChannel() {
+        channel = NetworkRegistry.ChannelBuilder.named(networkName).
+            clientAcceptedVersions(s -> Objects.equals(s, "1")).
+            serverAcceptedVersions(s -> Objects.equals(s, "1")).
+            networkProtocolVersion(() -> "1").
+            simpleChannel();
+
+        channel.messageBuilder(UpdateDroneInventoryMessage.class, 0).
+            decoder(UpdateDroneInventoryMessage::fromBytes).
+            encoder(UpdateDroneInventoryMessage::toBytes).
+            consumer(UpdateDroneInventoryMessage::onMessage).
+            add();
+    }
 }

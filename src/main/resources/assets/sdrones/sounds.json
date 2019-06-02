@@ -1,12 +1,16 @@
 {
-    "drone_driving": {
-        "category": "neutral",
-        "subtitle": "sdrones.subtitle.drone_driving",
-        "sounds": [ "sdrones:drones/drone_driving" ]
-    },
-    "drone_bleep": {
-        "category": "neutral",
-        "subtitle": "sdrones.subtitle.drone_bleep",
-        "sounds": [ "sdrones:drones/drone_bleep" ]
-    }
+  "drone_driving": {
+    "category": "neutral",
+    "subtitle": "sdrones.subtitle.drone_driving",
+    "sounds": [
+      "sdrones:drones/drone_driving"
+    ]
+  },
+  "drone_bleep": {
+    "category": "neutral",
+    "subtitle": "sdrones.subtitle.drone_bleep",
+    "sounds": [
+      "sdrones:drones/drone_bleep"
+    ]
+  }
 }

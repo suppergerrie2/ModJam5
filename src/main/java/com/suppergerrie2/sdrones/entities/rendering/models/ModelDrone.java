@@ -1,88 +1,95 @@
 package com.suppergerrie2.sdrones.entities.rendering.models;
 
+import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
+import java.util.List;
 import javax.annotation.Nullable;
-
-import com.suppergerrie2.sdrones.entities.EntityBasicDrone;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.entity.model.ModelBase;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
 
-/**
- * HaulerDrone - suppergerrie2
- * Created using Tabula 7.0.0
- */
-public class ModelDrone extends ModelBase {
-	float itemOffset = 0.5f;
+public abstract class ModelDrone extends ModelBase {
 
-	public void renderInventory(Entity entity) {
-		GlStateManager.pushMatrix();
+    /**
+     * Render the inventory of the drone
+     *
+     * @param entity The drone whose inventory has to be rendered
+     */
+    void renderInventory(EntityAbstractDrone entity) {
 
-		GlStateManager.scale(0.75D, 0.75D, 0.75D);
-		GlStateManager.translate(0.2, 1.7, -0.1);
-		GlStateManager.rotate(180, 0, 0, 1);
-		GlStateManager.rotate((float) (Math.sin(entity.ticksExisted%20/20f*Math.PI*2)*10f)-90, 1, 0, 0);
-		GlStateManager.rotate(270, 0, 1, 0);
+        //Render the weapon
+        ItemStack weapon = entity.getHeldItemMainhand();
 
-		ItemStack weapon = ((EntityBasicDrone)entity).getTool();
+        if (!weapon.isEmpty()) { //No need to render the weapon if there is no weapon
+            GlStateManager.pushMatrix();
 
-		if(!weapon.isEmpty()){
-			renderItemStack(weapon, entity.world, (EntityLivingBase) entity);
-		}
+            GlStateManager.scaled(0.75D, 0.75D, 0.75D);
+            GlStateManager.translated(0.2, 1.7, -0.1);
 
-		GlStateManager.popMatrix();
-		
-		GlStateManager.pushMatrix();
+            //Make the weapon rotate like it is being used
+            GlStateManager.rotatef(180, 0, 0, 1);
+            GlStateManager.rotatef((float) (Math.sin(entity.ticksExisted % 20 / 20f * Math.PI * 2) * 10f) - 90, 1, 0, 0);
+            GlStateManager.rotatef(270, 0, 1, 0);
 
-		GlStateManager.scale(0.75D, 0.75D, 0.75D);
-		GlStateManager.rotate(180, 0, 0, 1);
-		GlStateManager.translate(0, -1.5 + Math.sin(entity.ticksExisted%50/50f*Math.PI*2)*0.1f, 0);
-		
-		ItemStack[] stacks = ((EntityBasicDrone)entity).getItemStacksInDrone();
-		for(int i = 0; i < stacks.length; i++) {
-			ItemStack stack = stacks[i];
-			if(stack==null||stack.isEmpty()) {
-				continue;
-			}
-			
-			for(int j = 0; j < Math.max(1, Math.min(5, stack.getCount())); j++) {
-				GlStateManager.translate(0,itemOffset,0);
-				
-				renderItemStack(stack, entity.world, (EntityLivingBase) entity);
-			}
-		}
+            renderItemStack(weapon, entity.world, entity);
 
-		GlStateManager.popMatrix();
-	}
+            GlStateManager.popMatrix();
+        }
 
-	public void renderItemStack(ItemStack stack, World world, @Nullable EntityLivingBase entity) {
-		GlStateManager.pushMatrix();
+        //Render the drone's inventory hovering over it
+        GlStateManager.pushMatrix();
 
-		IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, world, entity);
-		model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GROUND, false);
+        GlStateManager.scaled(0.75D, 0.75D, 0.75D);
+        GlStateManager.rotatef(180, 0, 0, 1);
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-		Minecraft.getMinecraft().getRenderItem().renderItem(stack, model);
+        //This makes the items hover up and down instead of staying still
+        GlStateManager.translated(0, -1.25 + Math.sin(entity.ticksExisted % 50 / 50f * Math.PI * 2) * 0.1f, 0);
 
+        //The distance between each item
+        float itemOffset = 0.5f;
 
-		GlStateManager.popMatrix();
-	}
+        List<ItemStack> stacks = entity.getDroneInventory();
+        for (ItemStack stack : stacks) {
+            if (stack.isEmpty()) { //Dont render empty slots
+                continue;
+            }
 
-	/**
-	 * This is a helper function from Tabula to set the rotation of model parts
-	 */
-	public void setRotateAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-		modelRenderer.rotateAngleX = x;
-		modelRenderer.rotateAngleY = y;
-		modelRenderer.rotateAngleZ = z;
-	}
+            //Originally we only render max 5 items per stack. Now we render every item
+            for (int j = 0; j < /*Math.max(1, Math.min(5, stack.getCount()))*/ stack.getCount(); j++) {
+                renderItemStack(stack, entity.world, entity);
+
+                //Translate up so the next item will render above this one
+                GlStateManager.translated(0, itemOffset, 0);
+            }
+        }
+
+        GlStateManager.popMatrix();
+    }
+
+    /**
+     * Render an {@link ItemStack} in the world. It'll be rendered at the current render origin
+     *
+     * @param stack The {@link ItemStack} to render
+     * @param world The world
+     * @param entity The entity that has this stack
+     */
+    private void renderItemStack(ItemStack stack, World world, @Nullable EntityLivingBase entity) {
+        GlStateManager.pushMatrix();
+
+        IBakedModel model = Minecraft.getInstance().getItemRenderer().getItemModelWithOverrides(stack, world, entity);
+
+        model = ForgeHooksClient.handleCameraTransforms(model, TransformType.GROUND, false);
+
+        Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        Minecraft.getInstance().getItemRenderer().renderItem(stack, model);
+
+        GlStateManager.popMatrix();
+    }
+
 }

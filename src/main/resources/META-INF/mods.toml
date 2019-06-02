@@ -1,0 +1,20 @@
+modLoader="javafml" #mandatory
+# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
+loaderVersion="[24,)" #mandatory (24 is current forge version)
+# A URL to query for updates for this mod. See the JSON update specification <here>
+displayURL="https://suppergerrie2.com/" #optional
+# A text field displayed in the mod UI
+authors="suppergerrie2" #optional
+
+[[mods]] #mandatory
+# The modid of the mod
+modId="sdrones" #mandatory
+# The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
+version="${version}" #mandatory
+ # A display name for the mod
+displayName="Suppergerrie2's Drone Mod" #mandatory
+# The description text for the mod (multi line!) (#mandatory)
+description='''
+This mod adds tiny drones. Made for ModJam 5
+'''
+credits="Thanks Haze33E for creating the drone models! \nI also want to credit the forge team ofcourse"
