@@ -1,0 +1,30 @@
+{
+    "item.hauler_drone": "搬運機器人",
+    "item.fighter_drone": "格鬥機器人",
+    "item.tree_farm_drone": "伐木機器人",
+    "item.crop_farm_drone": "農耕機器人",
+    "item.archer_drone": "射手機器人",
+
+    "item.drone_stick": "機器人之杖",
+
+    "entity.hauler_drone": "搬運機器人",
+    "entity.fighter_drone": "格鬥機器人",
+    "entity.tree_farm_drone": "伐木機器人",
+    "entity.crop_farm_drone": "農耕機器人",
+    "entity.archer_drone": "射手機器人",
+    "entity.drone_arrow": "箭矢",
+
+    "sdrones.subtitle.drone_bleep": "機器人：嗶",
+    "sdrones.subtitle.drone_driving": "機器人正在運行中",
+
+    "dronestick.message.select": "右擊來選擇機器人。",
+    "dronestick.message.deselect": "SHIFT＋對著空氣右擊來取消選擇機器人。",
+    "dronestick.message.kill": "SHIFT＋右擊機器人以刪除它。",
+    "dronestick.message.sethome": "右擊在一個方塊上以設定家。",
+
+    "upgrade_tooltip": "%1$s，等級：%2$s",
+    "sdrones_storage": "庫藏升級",
+    "upgrade_drone": "升級機器人",
+
+    "itemGroup.tabDronesMod": "機器人"
+}

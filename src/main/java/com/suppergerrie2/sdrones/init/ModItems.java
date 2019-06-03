@@ -1,6 +1,7 @@
 package com.suppergerrie2.sdrones.init;
 
 import com.suppergerrie2.sdrones.Reference;
+import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
 import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
 import com.suppergerrie2.sdrones.items.ItemSpawnDrone;
 import net.minecraft.item.Item;
@@ -21,7 +22,8 @@ public class ModItems {
         LOGGER.info("Registering items...");
         event.getRegistry().registerAll(
             new Item(new Item.Properties()).setRegistryName(new ResourceLocation(Reference.MODID, "drone_stick")),
-            new ItemSpawnDrone<>("spawn_hauler", EntityHaulerDrone::new)
+            new ItemSpawnDrone<>("hauler_drone", EntityHaulerDrone::new),
+            new ItemSpawnDrone<>("fighter_drone", EntityFighterDrone::new)
         );
     }
 

@@ -1,6 +1,8 @@
 package com.suppergerrie2.sdrones.init;
 
 import com.suppergerrie2.sdrones.Reference;
+import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
+import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
 import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
 import net.minecraft.entity.EntityType;
 import net.minecraftforge.event.RegistryEvent;
@@ -13,6 +15,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class ModEntities {
 
     public static final EntityType<EntityHaulerDrone> hauler_drone = null;
+    public static final EntityType<EntityAbstractDrone> fighter_drone = null;
 
     @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
@@ -21,8 +24,14 @@ public class ModEntities {
             .build("hauler_drone")
             .setRegistryName(Reference.MODID, "hauler_drone");
 
+        EntityType<?> fighterDrone = EntityType.Builder.create(EntityFighterDrone.class, EntityFighterDrone::new)
+            .tracker(64, 1, false)
+            .build("fighter_drone")
+            .setRegistryName(Reference.MODID, "fighter_drone");
+
         event.getRegistry().registerAll(
-            haulerDrone
+            haulerDrone,
+            fighterDrone
         );
     }
 }

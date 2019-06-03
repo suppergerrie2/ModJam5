@@ -1,0 +1,18 @@
+{
+    "item.hauler_drone": "Dron transportista",
+    "item.fighter_drone": "Dron luchador",
+    "item.tree_farm_drone": "Dron talador",
+    "item.crop_farm_drone": "Dron cultivador",
+
+    "item.drone_stick": "Drone Stick",
+
+    "entity.hauler_drone": "Dron transportista",
+    "entity.fighter_drone": "Dron luchador",
+    "entity.tree_farm_drone": "Dron talador",
+    "entity.crop_farm_drone": "Dron cultivador",
+
+    "sdrones.subtitle.drone_bleep": "Dron beep",
+    "sdrones.subtitle.drone_driving": "Drone esta ocupado",
+
+    "itemGroup.tabDronesMod": "Drones"
+}

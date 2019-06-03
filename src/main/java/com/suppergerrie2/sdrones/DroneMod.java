@@ -1,13 +1,11 @@
 package com.suppergerrie2.sdrones;
 
-import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
+import com.suppergerrie2.sdrones.entities.EntityFighterDrone;
 import com.suppergerrie2.sdrones.entities.EntityHaulerDrone;
 import com.suppergerrie2.sdrones.entities.rendering.RenderDrone;
+import com.suppergerrie2.sdrones.entities.rendering.models.ModelFighterDrone;
 import com.suppergerrie2.sdrones.entities.rendering.models.ModelHaulerDrone;
 import com.suppergerrie2.sdrones.networking.DronesPacketHandler;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -26,12 +24,7 @@ public class DroneMod {
     }
 
     private void registerRenders(final FMLClientSetupEvent event) {
-        RenderingRegistry.registerEntityRenderingHandler(EntityHaulerDrone.class, new IRenderFactory<EntityHaulerDrone>() {
-
-            @Override
-            public Render<? super EntityAbstractDrone> createRenderFor(RenderManager manager) {
-                return new RenderDrone(manager, new ModelHaulerDrone(), "hauler_drone");
-            }
-        });
+        RenderingRegistry.registerEntityRenderingHandler(EntityHaulerDrone.class, manager -> new RenderDrone(manager, new ModelHaulerDrone(), "hauler_drone"));
+        RenderingRegistry.registerEntityRenderingHandler(EntityFighterDrone.class, manager -> new RenderDrone(manager, new ModelFighterDrone(), "fighter_drone"));
     }
 }

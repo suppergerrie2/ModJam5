@@ -1,10 +1,11 @@
 {
-  "item.sdrones.spawn_hauler": "Hauler Drone",
-  "item.sdrones.item_fighter_drone": "Fighter Drone",
-  "item.sdrones.item_tree_farm_drone": "Tree Farm Drone",
-  "item.sdrones.item_crop_farm_drone": "Crop Farm Drone",
-  "item.sdrones.item_archer_drone": "Archer Drone",
+  "item.sdrones.hauler_drone": "Hauler Drone",
+  "item.sdrones.fighter_drone": "Fighter Drone",
+  "item.sdrones.tree_farm_drone": "Tree Farm Drone",
+  "item.sdrones.crop_farm_drone": "Crop Farm Drone",
+  "item.sdrones.archer_drone": "Archer Drone",
   "item.sdrones.drone_stick": "Drone Stick",
+
   "entity.sdrones.basic_drone": "Basic Drone",
   "entity.sdrones.hauler_drone": "Hauler Drone",
   "entity.sdrones.fighter_drone": "Fighter Drone",
@@ -12,14 +13,18 @@
   "entity.sdrones.crop_farm_drone": "Crop Farm Drone",
   "entity.sdrones.archer_drone": "Archer Drone",
   "entity.sdrones.drone_arrow": "Arrow",
+
   "sdrones.subtitle.drone_bleep": "Drone bleeps",
   "sdrones.subtitle.drone_driving": "Drone is driving",
+
   "dronestick.message.select": "Right click to select drone.",
   "dronestick.message.deselect": "Shift+Right click in air to deselect drones.",
   "dronestick.message.kill": "Shift+Right on drone to kill drone.",
   "dronestick.message.sethome": "Right click on block to set home.",
+
   "upgrade_tooltip": "%1$s, level: %2$s",
   "sdrones_storage": "Storage Upgrade",
   "upgrade_drone": "Upgrade Drone",
+  
   "itemGroup.tabDronesMod": "Drones"
 }
