@@ -4,7 +4,7 @@
 		"1.3.1": "Fixed drone not dropping spawn item when it was spawned with the last item of the stack.\nFixed crop farm drone not farming or breaking blocks when out of dirt.\nFixed drone_upgrade not in lang file."
 	},
 	"promos": {
-		"1.12-latest": "1.3.1",
-		"1.12-recommended": "1.3.1"
+		"1.12.2-latest": "1.3.1",
+		"1.12.2-recommended": "1.3.1"
 	}
 }
