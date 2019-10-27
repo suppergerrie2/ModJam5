@@ -7,7 +7,7 @@
     ],
     "key": {
         "#": {
-            "item": "minecraft:redstone_torch"
+            "item": "minecraft:redstone_block"
         },
         "i": {
             "item": "minecraft:iron_ingot"
