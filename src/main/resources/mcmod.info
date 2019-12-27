@@ -1,16 +1,14 @@
-[
-{
+[{
   "modid": "sdrones",
   "name": "Suppergerrie2's Drone Mod",
   "description": "This mod adds tiny drones. Made for ModJam 5",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
+  "url": "https://minecraft.curseforge.com/projects/suppergerrie2s-drone-mod/files",
+  "updateUrl": "https://raw.githubusercontent.com/suppergerrie2/ModJam5/master/update.json",
   "authorList": ["suppergerrie2"],
-  "credits": "Thanks Haze33E for creating the drone models! \nI also want to credit the forge team ofcourse!",
+  "credits": "Thanks Haze33E for creating the drone models!\nI also want to credit the forge team of course!\nEricCreation (CurseForge) or VirxEC (GitHub) for version update notifications.",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
-}
-]
+}]

@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 
-@Mod(modid = Reference.MODID, name=Reference.MODNAME, version=Reference.VERSION, acceptedMinecraftVersions=Reference.ACCEPTED_MINECRAFT_VERSIONS)
+@Mod(modid = Reference.MODID, name=Reference.MODNAME, version=Reference.VERSION, updateJSON = Reference.UPDATE_URL, acceptedMinecraftVersions=Reference.ACCEPTED_MINECRAFT_VERSIONS)
 @Mod.EventBusSubscriber(modid=Reference.MODID)
 public class DroneMod {
 
