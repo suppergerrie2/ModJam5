@@ -1,20 +1,21 @@
 package com.suppergerrie2.sdrones.entities.rendering.models;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.model.ModelBase;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.renderer.model.Model;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
 
-public abstract class ModelDrone extends ModelBase {
+public abstract class ModelDrone extends EntityModel<EntityAbstractDrone> {
 
     /**
      * Render the inventory of the drone
@@ -79,14 +80,14 @@ public abstract class ModelDrone extends ModelBase {
      * @param world The world
      * @param entity The entity that has this stack
      */
-    private void renderItemStack(ItemStack stack, World world, @Nullable EntityLivingBase entity) {
+    private void renderItemStack(ItemStack stack, World world, @Nullable LivingEntity entity) {
         GlStateManager.pushMatrix();
 
         IBakedModel model = Minecraft.getInstance().getItemRenderer().getItemModelWithOverrides(stack, world, entity);
 
         model = ForgeHooksClient.handleCameraTransforms(model, TransformType.GROUND, false);
 
-        Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         Minecraft.getInstance().getItemRenderer().renderItem(stack, model);
 
         GlStateManager.popMatrix();

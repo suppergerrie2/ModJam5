@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "sdrones:items/fighter_drone"
+    "layer0": "sdrones:items/tree_farm_drone"
   }
 }

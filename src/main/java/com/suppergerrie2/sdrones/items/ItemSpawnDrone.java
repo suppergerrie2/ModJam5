@@ -4,22 +4,25 @@ import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
 import java.util.function.Function;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class ItemSpawnDrone<E extends EntityAbstractDrone> extends ItemDrone {
 
-    Function<DroneSpawnData, E> droneCreator;
+    private final Function<DroneSpawnData, E> droneCreator;
 
-    public ItemSpawnDrone(String name, Function<DroneSpawnData, E> droneCreator) {
-        super(name);
+    public ItemSpawnDrone(Function<DroneSpawnData, E> droneCreator) {
+        super();
         this.droneCreator = droneCreator;
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemUseContext context) {
+    @Nonnull
+    public ActionResultType onItemUse(ItemUseContext context) {
 
         ItemStack itemstack = context.getItem();
         World world = context.getWorld();
@@ -27,13 +30,14 @@ public class ItemSpawnDrone<E extends EntityAbstractDrone> extends ItemDrone {
         if (!world.isRemote) {
             ItemStack spawnStack = itemstack.copy();
             spawnStack.setCount(1);
-            BlockPos pos = context.getPos();
+
+            Vec3d hitVec = context.getHitVec();
 
             DroneSpawnData spawnData = new DroneSpawnData(
                 world,
-                pos.getX() + context.getHitX(),
-                pos.getY() + context.getHitY(), pos.getZ() +
-                context.getHitZ(),
+                hitVec.getX(),
+                hitVec.getY(),
+                hitVec.getZ(),
                 spawnStack,
                 context.getFace()
             );
@@ -46,14 +50,14 @@ public class ItemSpawnDrone<E extends EntityAbstractDrone> extends ItemDrone {
 //				entityDrone.setFilter(this.getFilter(itemstack));
 //			}
 
-            world.spawnEntity(entityDrone);
+            world.addEntity(entityDrone);
         }
 
-        if (!context.getPlayer().isCreative()) {
+        if (context.getPlayer() == null || !context.getPlayer().isCreative()) {
             itemstack.shrink(1);
         }
 
-        return EnumActionResult.SUCCESS;
+        return ActionResultType.SUCCESS;
     }
 
     public class DroneSpawnData {
@@ -61,10 +65,10 @@ public class ItemSpawnDrone<E extends EntityAbstractDrone> extends ItemDrone {
         public final World world;
         public final double x, y, z;
         public final ItemStack spawnItem;
-        public final EnumFacing spawnFacing;
+        public final Direction spawnFacing;
 
 
-        DroneSpawnData(World world, double x, double y, double z, ItemStack spawnItem, EnumFacing spawnFacing) {
+        DroneSpawnData(World world, double x, double y, double z, ItemStack spawnItem, Direction spawnFacing) {
             this.world = world;
             this.x = x;
             this.y = y;

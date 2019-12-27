@@ -1,49 +1,76 @@
 package com.suppergerrie2.sdrones.entities.ai;
 
 import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.pathfinding.Path;
+import net.minecraftforge.common.util.LazyOptional;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.item.EntityItem;
 
-public class EntityAISearchItems extends EntityAIBase {
+public class EntityAISearchItems extends Goal {
 
     private static final int PICKUP_DISTANCE = 1;
     //Item entities claimed by drones and how many items they will pickup
-    private static HashMap<UUID, Integer> claimedItems = new HashMap<>();
+    private static final HashMap<UUID, Integer> claimedItems = new HashMap<>();
+    private static final HashMap<UUID, Long> lastCheckAttempt = new HashMap<>();
+
     private final EntityAbstractDrone drone;
-    //Sorts the entities found so the drone goes for the closest item
-    private final EntityAINearestAttackableTarget.Sorter sorter;
-    private EntityItem target;
+
+    private ItemEntity target;
+    private int amountClaimed = 0;
 
     public EntityAISearchItems(EntityAbstractDrone drone) {
         this.drone = drone;
 
-        this.sorter = new EntityAINearestAttackableTarget.Sorter(drone);
-        this.setMutexBits(0b011);
+        this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.TARGET, Flag.JUMP));
     }
 
     @Override
     public boolean shouldExecute() {
+        drone.world.getProfiler().startSection("drone_search_should_execute");
         if (!drone.hasSpaceInInventory()) {
+            drone.world.getProfiler().endSection();
             return false;
         }
 
+        drone.world.getProfiler().startSection("find_items");
         //Get all items in the drone's range with a y diff of 4
         double range = drone.getRange();
-        List<EntityItem> itemsInRange = this.drone.world.getEntitiesWithinAABB(EntityItem.class, this.drone.getBoundingBox().grow(range, 4.0D, range));
 
-        itemsInRange.sort(this.sorter);
+        List<ItemEntity> itemsInRange = this.drone.world.getEntitiesWithinAABB(ItemEntity.class, this.drone.getBoundingBox().grow(range, 4.0D, range));
+
+        itemsInRange.sort((item1, item2) -> {
+
+            double d0 = this.drone.getDistanceSq(item1);
+            double d1 = this.drone.getDistanceSq(item2);
+
+            if (d0 < d1) {
+                return -1;
+            } else {
+                return d0 > d1 ? 1 : 0;
+            }
+
+        });
+
+        drone.world.getProfiler().endSection();
 
         if (itemsInRange.isEmpty()) {
             //No items found, so we cant do anything
+            drone.world.getProfiler().endSection();
             return false;
         } else {
+            drone.world.getProfiler().startSection("check_items");
             //Now find the first item that we can pickup and isn't already fully claimed
-            for (EntityItem item : itemsInRange) {
-                if (item.cannotPickup()) {
+            for (ItemEntity item : itemsInRange) {
+                if (item.cannotPickup() || drone.world.getGameTime() - lastCheckAttempt.getOrDefault(item.getUniqueID(), 0L) < 20) {
                     continue; //Item didnt want to be picked up so continue
                 }
 
@@ -56,14 +83,25 @@ public class EntityAISearchItems extends EntityAIBase {
 
                 //If itemsLeft > 0 then we know at least 1 item can be picked up by this drone.
                 if (itemsLeft > 0 && drone.canPickupItem(item.getItem())) {
-                    if (this.drone.getDistanceSq(item) < PICKUP_DISTANCE || drone.getNavigator().getPathToEntityLiving(item) != null) {
-                        target = item; //We can reach it so set it as target!
-                        claimedItems.put(item.getUniqueID(), Math.min(drone.getEmptySpace(), target.getItem().getCount())); //Tell the system we can pickup this many items
-                        return true;
+                    if(pathToEntity(item) == null) {
+                        lastCheckAttempt.put(item.getUniqueID(), drone.world.getGameTime());
+
+                        continue;
                     }
+
+                    target = item; //We can reach it so set it as target!
+
+                    int currentClaimed = claimedItems.getOrDefault(item.getUniqueID(), 0);
+                    amountClaimed = Math.min(drone.getEmptySpace(), itemsLeft);
+                    claimedItems.put(item.getUniqueID(), currentClaimed + amountClaimed); //Tell the system we can pickup this many items
+                    drone.world.getProfiler().endSection();
+                    drone.world.getProfiler().endSection();
+                    return true;
                 }
             }
+            drone.world.getProfiler().endSection();
         }
+        drone.world.getProfiler().endSection();
         return false;
     }
 
@@ -73,35 +111,55 @@ public class EntityAISearchItems extends EntityAIBase {
             return false;
         }
 
-        //If our target is dead we remove it from the claimedItems list (Most of the times this means all items are picked up, but it could also have despawned)
-        if (!target.isAlive()) {
-            claimedItems.remove(target.getUniqueID());
-            return false;
-        }
-
         //We need to continue as long as the target is not null, it's alive and we can still pickup our item
-//        boolean c = ;
-
-        if (!this.drone.canPickupItem(target.getItem()) && target != null) {
-//            claimedItems.remove(target.getUniqueID()); //TODO: Should this remove it from the list? This may cause drone's to think they can pick up an item they actually cant
-            target = null;
+        if (!target.isAlive() || !this.drone.canPickupItem(target.getItem())) {
+            unclaimTarget();
             return false;
         }
 
         return true;
     }
 
+    private void unclaimTarget() {
+        if(drone.world.isRemote) return;
+
+        int totalClaimed = claimedItems.getOrDefault(target.getUniqueID(), 0);
+        if(totalClaimed == amountClaimed) {
+            claimedItems.remove(target.getUniqueID());
+        } else {
+            claimedItems.put(target.getUniqueID(), totalClaimed - amountClaimed);
+        }
+
+        target = null;
+    }
+
     @Override
     public void startExecuting() {
-        this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed(drone.getDistance(target)));
+        this.drone.getNavigator().setPath(pathToEntity(target), 1);
+    }
+
+    private Path pathToEntity(Entity e) {
+        drone.world.getProfiler().startSection("pathToEntity");
+        Path path =  drone.getNavigator().getPathToEntityLiving(e, 0);
+
+        if(path != null && path.func_224771_h()) {
+            drone.world.getProfiler().endSection();
+            return path;
+        }
+
+        drone.world.getProfiler().endSection();
+        return null;
     }
 
     @Override
     public void tick() {
+        if(drone.world.isRemote) return;
 
-        if (this.drone.getNavigator().noPath() || this.drone.getNavigator().getPath().isFinished()) {
-            System.out.println("Lost path... recalculating"); //TODO: Remove debug log
-            this.drone.getNavigator().tryMoveToEntityLiving(target, drone.getSpeed(drone.getDistance(target)));
+        if(target == null) return;
+
+        if (this.drone.getNavigator().noPath()) {
+            unclaimTarget();
+            return;
         }
 
         if (this.drone.getDistanceSq(target) < PICKUP_DISTANCE && !target.cannotPickup()) {
@@ -110,6 +168,7 @@ public class EntityAISearchItems extends EntityAIBase {
             if (claimedItems.containsKey(target.getUniqueID()) && claimedItems.get(target.getUniqueID()) != null) {
                 int count = claimedItems.get(target.getUniqueID());
                 claimedItems.put(target.getUniqueID(), --count); //Decrease count because we picked up the item
+                amountClaimed--;
 
                 if (claimedItems.get(target.getUniqueID()) <= 0) {
                     claimedItems.remove(target.getUniqueID());

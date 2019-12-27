@@ -6,64 +6,60 @@ import com.suppergerrie2.sdrones.networking.UpdateDroneInventoryMessage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIOpenDoor;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
+import net.minecraft.entity.ai.goal.OpenDoorGoal;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 @SuppressWarnings("EntityConstructor")
-public abstract class EntityAbstractDrone extends EntityCreature implements IEntityAdditionalSpawnData {
+public abstract class EntityAbstractDrone extends CreatureEntity implements IEntityAdditionalSpawnData {
 
+    private final List<ItemStack> filter = new ArrayList<>();
     //The item the drone was spawned with.
     //We save this so we can drop it later.
     //We save it so we dont have to reproduce an item based on upgrades.
     private ItemStack spawnItem = ItemStack.EMPTY;
-
     //Save the face of the block its home is set to.
     //Needed to be able to handle blocks like furnaces correctly.
     //The face of the block determines which slot to input to.
-    private EnumFacing homeFacing = EnumFacing.DOWN;
-
+    private Direction homeFacing = Direction.DOWN;
     private NonNullList<ItemStack> droneInventory = NonNullList.withSize(0, ItemStack.EMPTY);
-    private List<ItemStack> filter = new ArrayList<>();
 
-    public EntityAbstractDrone(EntityType<? extends EntityAbstractDrone> type, World world) {
+    EntityAbstractDrone(EntityType<? extends EntityAbstractDrone> type, World world) {
         super(type, world);
-        this.setSize(0.3f, 0.3f);
         this.enablePersistence();
         this.setPathPriority(PathNodeType.WATER, 0f);
         this.setAIMoveSpeed(1);
     }
 
-    public EntityAbstractDrone(EntityType<? extends EntityAbstractDrone> type, World world, double x, double y, double z, ItemStack spawnItem, EnumFacing facing, int inventorySize) {
+    EntityAbstractDrone(EntityType<? extends EntityAbstractDrone> type, World world, double x, double y, double z, ItemStack spawnItem, Direction facing, int inventorySize) {
         this(type, world);
 
         this.setPosition(x, y, z);
@@ -115,8 +111,8 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
     }
 
     @Override
-    protected void initEntityAI() {
-        this.tasks.addTask(0, new EntityAIOpenDoor(this, true));
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new OpenDoorGoal(this, true));
     }
 
     /**
@@ -155,17 +151,17 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
      * @param compound The compound to save to.
      */
     @Override
-    public void writeAdditional(NBTTagCompound compound) {
+    public void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
 
         //Save the carry size of the bot. TODO: Possibly let this be handled by the upgrade system instead of manually saving it.
         compound.putInt("CarrySize", this.getCarrySize());
 
         //Save the inventory
-        NBTTagList itemsInDroneTagList = new NBTTagList();
+        ListNBT itemsInDroneTagList = new ListNBT();
 
         for (ItemStack itemstack : this.droneInventory) {
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            CompoundNBT nbttagcompound = new CompoundNBT();
 
             if (itemstack != null && !itemstack.isEmpty()) {
                 itemstack.write(nbttagcompound);
@@ -177,10 +173,10 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
         compound.put("ItemsInDrone", itemsInDroneTagList);
 
         //Save the filter
-        NBTTagList filterTagList = new NBTTagList();
+        ListNBT filterTagList = new ListNBT();
 
         for (ItemStack itemstack : this.filter) {
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
+            CompoundNBT nbttagcompound = new CompoundNBT();
 
             if (itemstack != null && !itemstack.isEmpty()) {
                 itemstack.write(nbttagcompound);
@@ -192,7 +188,7 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
         compound.put("Filter", filterTagList);
 
         //Save the item the entity is spawned with.
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
+        CompoundNBT nbttagcompound = new CompoundNBT();
         this.spawnItem.write(nbttagcompound);
         compound.put("SpawnItem", nbttagcompound);
 
@@ -208,7 +204,7 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
     }
 
     @Override
-    public void readAdditional(NBTTagCompound compound) {
+    public void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
 
         //Load the carry size of the bot TODO: This should probably not be loaded like this but instead be read from the saved inventory size
@@ -219,16 +215,21 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
 
         //Load the inventory
         if (compound.contains("ItemsInDrone")) {
-            NBTTagList nbttaglist = compound.getList("ItemsInDrone", 10);
-            droneInventory.clear();
-            for (int i = 0; i < droneInventory.size(); ++i) {
+            ListNBT nbttaglist = compound.getList("ItemsInDrone", 10);
+            if(droneInventory.size() != nbttaglist.size()) {
+                droneInventory = NonNullList.withSize(nbttaglist.size(), ItemStack.EMPTY);
+            } else {
+                droneInventory.clear();
+            }
+
+            for (int i = 0; i < nbttaglist.size(); i++) {
                 droneInventory.set(i, ItemStack.read(nbttaglist.getCompound(i)));
             }
         }
 
         //Load the filter
         if (compound.contains("Filter")) {
-            NBTTagList nbttaglist = compound.getList("Filter", 10);
+            ListNBT nbttaglist = compound.getList("Filter", 10);
 
             for (int i = 0; i < nbttaglist.size(); ++i) {
                 this.filter.add(ItemStack.read(nbttaglist.getCompound(i)));
@@ -247,7 +248,7 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
         }
 
         if (compound.contains("HomeFacing")) {
-            this.homeFacing = EnumFacing.byName(compound.getString("HomeFacing"));
+            this.homeFacing = Direction.byName(compound.getString("HomeFacing"));
         }
 
 //        if (compound.hasKey("Range")) {
@@ -273,7 +274,7 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
      *
      * @param item The item entity
      */
-    public void pickupEntityItem(EntityItem item) {
+    public void pickupEntityItem(ItemEntity item) {
         if (!item.cannotPickup() && this.canPickupItem(item.getItem())) {
 
             for (int i = 0; i < this.getDroneInventory().size(); i++) {
@@ -355,7 +356,7 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
      * @param pos The position of the block to extract from
      * @param itemCheck A predicate if more specific checks are needed (Eg. Nbt)
      */
-    public void tryGetItem(Item itemType, BlockPos pos, @Nullable Predicate<ItemStack> itemCheck) {
+    void tryGetItem(Item itemType, BlockPos pos, @Nullable Predicate<ItemStack> itemCheck) {
         if (!this.hasSpaceInInventory()) {
             return;
         }
@@ -369,16 +370,17 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
                 ItemStack pickedUp = this.tryGetFromInventory(itemType, itemHandler, itemCheck);
 
                 List<ItemStack> stacksInDrone = this.getDroneInventory();
-                for (int i = 0; i < stacksInDrone.size(); i++) {
-                    if (stacksInDrone.get(i) == null || stacksInDrone.get(i).isEmpty()) {
-                        this.setItemStackInDrone(i, pickedUp);
+                for (int i = 0; i < stacksInDrone.size() && !pickedUp.isEmpty(); i++) {
+                    if (stacksInDrone.get(i).isEmpty()) {
+                        ItemStack toInsert = pickedUp.split(1);
+                        this.setItemStackInDrone(i, toInsert);
                     }
                 }
 
                 ItemStack rest = tryPutInInventory(pickedUp, itemHandler);
 
-                EntityItem item = new EntityItem(this.world, this.posX, this.posY, this.posZ, rest);
-                this.world.spawnEntity(item);
+                ItemEntity item = new ItemEntity(this.world, this.posX, this.posY, this.posZ, rest);
+                this.world.addEntity(item);
             });
         }
     }
@@ -496,13 +498,12 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
      *
      * @return The current carry size of the drone.
      */
-    public int getCarrySize() {
+    private int getCarrySize() {
         return droneInventory.size();
     }
 
     /**
-     * Returns the amount of empty slots the drone has.
-     * An empty slot is a slot where {@link ItemStack#isEmpty()} returns true
+     * Returns the amount of empty slots the drone has. An empty slot is a slot where {@link ItemStack#isEmpty()} returns true
      *
      * @return the amount of empty slots
      */
@@ -524,26 +525,14 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
      *
      * If {@link World#isRemote} is true nothing will happen.
      */
-    private void sendInventoryPacket() {
+    void sendInventoryPacket() {
         if (world.isRemote) {
             return;
         }
 
-        //Get all players currently tracking this entity.
-        Set<? extends EntityPlayer> players = ((WorldServer) world).getEntityTracker().getTrackingPlayers(this);
-
-        //Send the packet to all players.
-        for (EntityPlayer player : players) {
-            if (player instanceof EntityPlayerMP) {
-
-                //Send the packet over the mod channel from the server to the client.
-                DronesPacketHandler.channel.sendTo(
-                    new UpdateDroneInventoryMessage(this.getDroneInventory(), this.getEntityId()),
-                    ((EntityPlayerMP) player).connection.getNetworkManager(),
-                    NetworkDirection.PLAY_TO_CLIENT
-                );
-            }
-        }
+        //Send the packet over the mod channel from the server to the client.
+        DronesPacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY.with(() -> this),
+            new UpdateDroneInventoryMessage(this.getDroneInventory(), this.getEntityId()));
     }
 
     /**
@@ -569,7 +558,7 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
     //region Minecraft overrides
 
     @Override
-    public boolean canTrample(IBlockState state, BlockPos pos, float fallDistance) {
+    public boolean canTrample(BlockState state, BlockPos pos, float fallDistance) {
         return false; //Drone's are too light to trample blocks.
     }
 
@@ -595,7 +584,7 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
     }
 
     @Override
-    protected void playStepSound(BlockPos pos, IBlockState blockIn) {
+    protected void playStepSound(@Nonnull BlockPos pos, BlockState blockIn) {
         //"Step" sound may be the wrong word for a drone :P
 
         this.playSound(ModSoundEvents.droneDrivingSound, 0.15F, 1.0F);
@@ -617,11 +606,16 @@ public abstract class EntityAbstractDrone extends EntityCreature implements IEnt
     }
 
     @Override
+    @Nonnull
     public AxisAlignedBB getRenderBoundingBox() {
         //Makes the rendering slightly better, it now cuts of later. TODO: Find out if there is a way to stop the rendering stopping to soon
         return super.getRenderBoundingBox().expand(0, 1 + 0.5 * getCarrySize(), 0);
     }
 
+    @Override
+    @Nonnull
+    public IPacket<?> createSpawnPacket() {
+        return NetworkHooks.getEntitySpawningPacket(this);
+    }
     //endregion
-
 }

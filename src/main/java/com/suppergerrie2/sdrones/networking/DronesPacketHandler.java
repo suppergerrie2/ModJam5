@@ -9,7 +9,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 public class DronesPacketHandler {
 
     public static SimpleChannel channel;
-    private static ResourceLocation networkName = new ResourceLocation(Reference.MODID, "net");
+    private static final ResourceLocation networkName = new ResourceLocation(Reference.MODID, "net");
 
     public static void registerChannel() {
         channel = NetworkRegistry.ChannelBuilder.named(networkName).

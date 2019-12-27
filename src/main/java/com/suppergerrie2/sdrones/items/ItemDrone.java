@@ -10,9 +10,8 @@ import net.minecraft.world.World;
 
 public abstract class ItemDrone extends Item {
 
-    public ItemDrone(String name) {
+    ItemDrone() {
         super(new Properties());
-        this.setRegistryName(Reference.MODID, name);
     }
 
     @Override

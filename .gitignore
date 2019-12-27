@@ -14,7 +14,9 @@
 
 # include sourcecode
 !src/
-src/main/java.old
+src/main/java.old/
+src/generated/
+src/main/resources/assets/sdrones.old/
 
 # include git important files
 !.gitignore

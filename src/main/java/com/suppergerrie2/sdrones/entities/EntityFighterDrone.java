@@ -5,19 +5,23 @@ import com.suppergerrie2.sdrones.entities.ai.EntityAIGoHome;
 import com.suppergerrie2.sdrones.init.ModEntities;
 import com.suppergerrie2.sdrones.items.ItemSpawnDrone;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.monster.EntityShulker;
-import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.init.Items;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.monster.ShulkerEntity;
+import net.minecraft.entity.monster.SlimeEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class EntityFighterDrone extends EntityAbstractDrone {
 
@@ -27,20 +31,24 @@ public class EntityFighterDrone extends EntityAbstractDrone {
 
     //TODO: Variable weapons?
     public EntityFighterDrone(World worldIn) {
-        super(ModEntities.fighter_drone, worldIn);
+        this(ModEntities.fighter_drone, worldIn);
+    }
+
+    public EntityFighterDrone(EntityType<EntityAbstractDrone> entityType, World world) {
+        super(entityType, world);
     }
 
     @Override
-    protected void initEntityAI() {
-        super.initEntityAI();
+    protected void registerGoals() {
+        super.registerGoals();
 
-        this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
-        this.tasks.addTask(1, new EntityAIGoHome(this));
-        this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
+        this.goalSelector.addGoal(0, new MeleeAttackGoal(this, 1.0D, false));
+        this.goalSelector.addGoal(1, new EntityAIGoHome(this));
+        this.goalSelector.addGoal(2, new WaterAvoidingRandomWalkingGoal(this, 1.0f));
 
-        this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<>(this, EntityMob.class, 10, false, true, (Predicate<EntityLiving>) possibleTarget -> possibleTarget != null && !(possibleTarget instanceof EntityCreeper)));
-        this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<>(this, EntitySlime.class, false, true));
-        this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<>(this, EntityShulker.class, false, true));
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, MonsterEntity.class, 10, false, true, (Predicate<LivingEntity>) possibleTarget -> possibleTarget != null && !(possibleTarget instanceof CreeperEntity)));
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, SlimeEntity.class, false, true));
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, ShulkerEntity.class, false, true));
     }
 
     @Override
@@ -48,7 +56,7 @@ public class EntityFighterDrone extends EntityAbstractDrone {
         super.registerAttributes();
         this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
 
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
         this.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(7.0D);
     }
 
@@ -58,6 +66,7 @@ public class EntityFighterDrone extends EntityAbstractDrone {
     }
 
     @Override
+    @Nonnull
     public ItemStack getHeldItemMainhand() {
         return new ItemStack(Items.DIAMOND_SWORD); //TODO: Dont recreate the itemstack when changeable weapons are added.
     }
@@ -66,6 +75,7 @@ public class EntityFighterDrone extends EntityAbstractDrone {
     public void tick() {
         super.tick();
 
+        //TODO: Dont regen during fight?
         if (!world.isRemote) {
             //Drone heals 1 health (0.5 heart) every second
             if (this.getHealth() < this.getMaxHealth() && this.ticksExisted % 20 == 0) {

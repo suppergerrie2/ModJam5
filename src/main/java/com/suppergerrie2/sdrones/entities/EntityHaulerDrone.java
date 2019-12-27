@@ -5,7 +5,8 @@ import com.suppergerrie2.sdrones.entities.ai.EntityAIGoHome;
 import com.suppergerrie2.sdrones.entities.ai.EntityAISearchItems;
 import com.suppergerrie2.sdrones.init.ModEntities;
 import com.suppergerrie2.sdrones.items.ItemSpawnDrone;
-import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.world.World;
 
 public class EntityHaulerDrone extends EntityAbstractDrone {
@@ -15,17 +16,21 @@ public class EntityHaulerDrone extends EntityAbstractDrone {
     }
 
     public EntityHaulerDrone(World world) {
-        super(ModEntities.hauler_drone, world);
+        this(ModEntities.hauler_drone, world);
+    }
+
+    public EntityHaulerDrone(EntityType<EntityAbstractDrone> entityType, World world) {
+        super(entityType, world);
     }
 
     @Override
-    protected void initEntityAI() {
-        super.initEntityAI();
+    protected void registerGoals() {
+        super.registerGoals();
 
-        this.tasks.addTask(0, new EntityAISearchItems(this));
-        this.tasks.addTask(1, new EntityAIBringItemHome(this));
-        this.tasks.addTask(2, new EntityAIWanderAvoidWater(this, 1.0f));
-        this.tasks.addTask(2, new EntityAIGoHome(this));
+        this.goalSelector.addGoal(0, new EntityAISearchItems(this));
+        this.goalSelector.addGoal(1, new EntityAIBringItemHome(this));
+        this.goalSelector.addGoal(2, new WaterAvoidingRandomWalkingGoal(this, 1.0f));
+        this.goalSelector.addGoal(2, new EntityAIGoHome(this));
     }
 
 }

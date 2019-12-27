@@ -16,5 +16,4 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-install: "./gradlew setupCIWorkspace"
 script: "./gradlew build test"

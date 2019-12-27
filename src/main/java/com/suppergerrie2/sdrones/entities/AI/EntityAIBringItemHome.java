@@ -1,16 +1,17 @@
 package com.suppergerrie2.sdrones.entities.ai;
 
 import com.suppergerrie2.sdrones.entities.EntityAbstractDrone;
-import net.minecraft.entity.ai.EntityAIBase;
+import java.util.EnumSet;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
 
-public class EntityAIBringItemHome extends EntityAIBase {
+public class EntityAIBringItemHome extends Goal {
 
     private final EntityAbstractDrone drone;
 
     public EntityAIBringItemHome(EntityAbstractDrone drone) {
         this.drone = drone;
-        this.setMutexBits(0b11);
+        this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.JUMP, Flag.TARGET));
     }
 
     @Override
@@ -20,7 +21,7 @@ public class EntityAIBringItemHome extends EntityAIBase {
 
     @Override
     public boolean shouldContinueExecuting() {
-        return drone.hasItems() && drone.getDistanceSq(drone.getHomePosition()) > 1.3f;
+        return drone.hasItems() && !drone.getHomePosition().withinDistance(drone.getPositionVec(), 1.3f);
     }
 
     @Override
@@ -30,13 +31,17 @@ public class EntityAIBringItemHome extends EntityAIBase {
 
     @Override
     public void tick() {
-        if (drone.getDistanceSq(drone.getHomePosition()) < 1.5f * 1.5f) {
+        if(this.drone.getNavigator().noPath()) {
+            moveHome();
+        }
+
+        if (drone.getHomePosition().withinDistance(drone.getPositionVec(), 1.5)) {
             drone.insertInventoryInBlock(drone.getHomePosition());
         }
     }
 
     private void moveHome() {
         BlockPos home = this.drone.getHomePosition();
-        this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed((float) drone.getDistance(home.getX(), home.getY(), home.getZ())));
+        this.drone.getNavigator().tryMoveToXYZ(home.getX(), home.getY(), home.getZ(), drone.getSpeed((float) home.distanceSq(drone.getPositionVec(), true)));
     }
 }
